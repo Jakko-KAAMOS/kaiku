@@ -1,0 +1,73 @@
+# audio
+*.flac
+*.wav
+*.mp3
+*.aiff
+*.ogg
+*.opus
+*.wma
+*.m4a
+*.aac
+*.wv
+*.ape
+*.dsf
+*.dff
+*.mid
+*.midi
+
+# DAW project files
+*.rpp
+*.rpp-bak
+*.als
+*.alp
+*.logic
+*.ptx
+*.ptf
+*.cpr
+*.npr
+*.fpl
+*.flp
+
+# rendered / stems
+*.stem.mp4
+*.stems
+*.pdf
+_render/
+
+# binaries
+*.com
+*.bin
+
+# python
+__pycache__/
+*.pyc
+*.raw
+
+# images
+*.png
+*.jpg
+*.jpeg
+
+# os
+.DS_Store
+Thumbs.db
+
+# internal / deploy
+deploy_games.sh
+deploy*.sh
+PR.md
+COMMIT.md
+CLAUDE.md
+agents/
+
+# build artifacts
+build/
+vsti/build/
+
+# generated eval artifacts
+eval/exercises/sheets/
+eval/scores/thumbs/
+eval/scores/make-thumbs.sh
+
+# wiki (managed separately via push-wiki.sh)
+_wiki/

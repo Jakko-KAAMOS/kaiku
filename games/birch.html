@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>birch — kaamos palette</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --void:          #0c0c0c;
+    --tile:          #141210;
+    --rule:          #222018;
+    --border:        #2e2418;
+    --amber:         #f0a030;
+    --amber-dim:     #9a6820;
+    --amber-low:     #3a2810;
+    --amber-bright:  #f5c060;
+    --text:          #dfd0b0;
+    --text-dim:      #8a7a60;
+    --harmaa:        #586070;
+    --violet:        #702890;
+    --violet-mid:    #4a1858;
+    --violet-dim:    #280d30;
+    --green:         #90c830;
+    --jarvi:         #3a7890;
+    --taivas:        #80b8cc;
+    --danger:        #e83820;
+  }
+
+  html {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3.5rem 2rem 6rem;
+  }
+
+  /* ── HEADER ── */
+  .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2.5rem;
+  }
+
+  .site-nav a {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber-low);
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .site-nav a:hover {
+    color: var(--amber);
+    border-bottom-color: var(--amber-dim);
+  }
+
+  .site-mark {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 2.5rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 3rem;
+  }
+
+  /* ── RULE ── */
+  .rule {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--amber-dim), transparent);
+    margin: 2.5rem 0;
+  }
+
+  /* ── SEASON BAR ── */
+  .season-bar {
+    display: flex;
+    position: relative;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  .season-bar .seg { height: 100%; }
+  .season-bar .seg-winter  { flex: 8; background: var(--harmaa); opacity: 0.4; }
+  .season-bar .seg-spring  { flex: 0.3; background: var(--green); }
+  .season-bar .seg-summer  { flex: 0.1; background: var(--taivas); }
+  .season-bar .seg-winter2 { flex: 3.6; background: var(--harmaa); opacity: 0.4; }
+
+  .season-cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    background: var(--amber);
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 1s;
+  }
+  .season-cursor.done { opacity: 0; }
+
+  /* ── VOL SELECTOR ── */
+  .vol-selector {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    margin-bottom: 2rem;
+    margin-top: -1.25rem;
+  }
+
+  .vol-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.2rem;
+    color: var(--amber-dim);
+    opacity: 0.3;
+    transition: opacity 0.2s, color 0.2s;
+    line-height: 0;
+  }
+
+  .vol-btn:hover  { opacity: 0.6; }
+  .vol-btn.active { opacity: 1; color: var(--amber); }
+
+  .season-labels {
+    display: flex;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+  }
+  .season-labels span { flex: 1; }
+  .season-labels .sl-spring { color: var(--green); opacity: 0.8; }
+  .season-labels .sl-summer { color: var(--taivas); opacity: 0.8; }
+
+  /* ── TWO-COLUMN LAYOUT ── */
+  .workspace {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (max-width: 680px) {
+    .workspace { grid-template-columns: 1fr; }
+  }
+
+  /* ── GLYPH PANEL ── */
+  .panel-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 1.25rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .ctrl-row label {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  input[type=range] {
+    flex: 1;
+    accent-color: var(--amber);
+    cursor: pointer;
+  }
+
+  .val {
+    font-size: 0.65rem;
+    color: var(--amber);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .tray {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 10px;
+  }
+
+  .tile {
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s, opacity 0.15s;
+    user-select: none;
+  }
+
+  .tile.slideable {
+    cursor: pointer;
+  }
+
+  .tile.slideable:hover {
+    border-color: var(--amber-dim);
+  }
+
+  .tile-empty {
+    border-radius: 3px;
+    border: 1px dashed var(--border);
+    opacity: 0.25;
+  }
+
+  .tile .lbl {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+  }
+
+  .puzzle-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .btn-shuffle {
+    font-family: 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber-dim);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .btn-shuffle:hover {
+    color: var(--amber);
+    border-color: var(--amber-dim);
+  }
+
+  /* ── SCRABBLE TRAY ── */
+  .scrabble-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+    margin-top: 1.5rem;
+  }
+
+  .scrabble-tray {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--void);
+    transition: border-color 0.4s;
+  }
+
+  .scrabble-tray.victory {
+    border-color: var(--amber);
+  }
+
+  .scrabble-tile {
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .scrabble-tile .lbl {
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+
+  .scrabble-tile.correct {
+    border-color: var(--amber-dim);
+    background: var(--amber-low);
+  }
+
+  .scrabble-tile.correct .lbl {
+    color: var(--amber);
+  }
+
+  .solved-msg {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .solved-msg.visible { opacity: 1; }
+
+  .move-count {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    line-height: 1.2;
+  }
+
+  .move-count .move-n {
+    font-size: 2rem;
+    color: var(--amber);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.5rem;
+  }
+
+  .move-count .move-fi {
+    font-size: 1rem;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── PALETTE PANEL ── */
+  .palette-panel { }
+
+  .season-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .season-name {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .swatches {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    transition: border-color 0.1s, background 0.1s;
+  }
+
+  .swatch:hover { background: var(--tile); border-color: var(--border); }
+  .swatch.active { border-color: var(--amber-dim); background: var(--tile); }
+
+  .swatch-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .swatch-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .swatch-fi {
+    font-size: 0.65rem;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .swatch-hex {
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── INVITATION ── */
+  .invitation {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text-dim);
+    max-width: 560px;
+  }
+
+  .invitation strong {
+    color: var(--text);
+    font-weight: normal;
+  }
+
+  .invitation a {
+    color: var(--amber-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber-low);
+  }
+
+  .invitation a:hover { color: var(--amber); border-bottom-color: var(--amber-dim); }
+
+  /* ── SOUND TOGGLE ── */
+  .snd-btn {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-transform: lowercase;
+  }
+  .snd-btn:hover { color: var(--amber); }
+  .snd-btn.muted { color: var(--amber-low); text-decoration: line-through; }
+
+</style>
+<link rel="icon" id="favicon" type="image/svg+xml" href="">
+<script src="/favicon.js"></script>
+</head>
+<body>
+
+<div class="site-nav">
+  <span class="site-mark">rebraining.org &mdash; kaamos</span>
+  <a href="https://github.com/jmcgill-public/kaiku/blob/main/games/birch.html" target="_blank" rel="noopener">source</a>
+  <a href="/kuule">Selli's Grilli &rarr;</a>
+</div>
+<h1>birch</h1>
+<div class="subtitle">glyph renderer &amp; palette &mdash; yksi pilkku nolla</div>
+
+<div class="season-bar" id="season-bar">
+  <div class="seg seg-winter"></div>
+  <div class="seg seg-spring"></div>
+  <div class="seg seg-summer"></div>
+  <div class="seg seg-winter2"></div>
+  <div class="season-cursor" id="season-cursor"></div>
+</div>
+<div class="season-labels">
+  <span>talvi</span>
+  <span class="sl-spring">kevät</span>
+  <span class="sl-summer">kesä</span>
+  <span></span>
+</div>
+
+<div class="vol-selector">
+  <!-- mute: sealed lips -->
+  <button class="vol-btn" id="vol-0" onclick="setVol(0)" title="mute" aria-label="mute">
+    <svg width="22" height="10" viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M3,5 Q11,3.5 19,5"/>
+    </svg>
+  </button>
+  <!-- normal: gently parted -->
+  <button class="vol-btn active" id="vol-1" onclick="setVol(1)" title="normal" aria-label="normal volume">
+    <svg width="22" height="10" viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M3,5 Q11,1 19,5 Q11,9 3,5 Z"/>
+    </svg>
+  </button>
+  <!-- max: open -->
+  <button class="vol-btn" id="vol-2" onclick="setVol(2)" title="max" aria-label="max volume">
+    <svg width="22" height="10" viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M2,5 Q11,-2 20,5 Q11,12 2,5 Z"/>
+    </svg>
+  </button>
+</div>
+
+<div class="workspace">
+
+  <!-- LEFT: glyph renderer -->
+  <div class="glyph-panel">
+    <div class="panel-label">glyph renderer — eight stations</div>
+
+    <div class="controls">
+      <div class="ctrl-row">
+        <label>size</label>
+        <input type="range" id="sz" min="60" max="160" value="127">
+        <span class="val" id="szval">127</span>
+      </div>
+      <div class="ctrl-row">
+        <label>droop</label>
+        <input type="range" id="droop" min="0" max="30" value="11">
+        <span class="val" id="droopval">11%</span>
+      </div>
+      <div class="ctrl-row">
+        <label>trunk</label>
+        <input type="range" id="trunk" min="10" max="40" value="31">
+        <span class="val" id="trunkval">31%</span>
+      </div>
+      <div class="ctrl-row">
+        <label>branchlet</label>
+        <input type="range" id="blet" min="0" max="1" value="1">
+        <span class="val" id="bletval">on</span>
+      </div>
+      <div class="ctrl-row">
+        <label>rotation</label>
+        <input type="range" id="rot" min="-180" max="180" value="0">
+        <span class="val" id="rotval">0°</span>
+      </div>
+    </div>
+
+    <div class="scrabble-label">kohde — destination</div>
+    <div class="scrabble-tray" id="scrabble-tray"></div>
+
+    <div class="tray" id="tray"></div>
+    <div class="puzzle-controls">
+      <button class="btn-shuffle" id="btn-shuffle">new puzzle</button>
+      <span class="solved-msg" id="solved-msg">ratkaisu — solved</span>
+    </div>
+    <div class="move-count">
+      <span class="move-n" id="move-n">0</span>
+      <span class="move-fi" id="move-fi">nolla</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: palette -->
+  <div class="palette-panel">
+    <div class="panel-label">palette — click to apply</div>
+
+    <div class="season-group">
+      <div class="season-name">meripihka — the signal</div>
+      <div class="swatches" id="swatches-amber"></div>
+    </div>
+
+    <div class="season-group">
+      <div class="season-name">talvi — winter (dominant)</div>
+      <div class="swatches" id="swatches-winter"></div>
+    </div>
+
+    <div class="season-group">
+      <div class="season-name">kevät / kesä — three days / one day</div>
+      <div class="swatches" id="swatches-brief"></div>
+    </div>
+
+    <div class="season-group">
+      <div class="season-name">hiljaisuus — the silence</div>
+      <div class="swatches" id="swatches-violet"></div>
+    </div>
+
+    <div class="season-group">
+      <div class="season-name">vaara — reserve</div>
+      <div class="swatches" id="swatches-danger"></div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="rule">
+
+<div class="invitation">
+  <p>Eight stations. A different tree for each one. Every colour here has a name.
+  <a href="/sanasto#palette">palette</a></p>
+  <br>
+  <p>The puzzle generates a target arrangement. You move glyphs until they match, or until you stop.
+  The system does not distinguish between those outcomes.
+  Winter is the dominant condition here. The brief seasons are brief on purpose.
+  <a href="essays/clocks">The void has no clocks.</a></p>
+</div>
+
+<script>
+const PALETTE = {
+  amber: [
+    { fi: 'hehku',      hex: '#f5c060' },
+    { fi: 'meripihka',  hex: '#f0a030' },
+    { fi: 'meripihka-dim', hex: '#9a6820' },
+    { fi: 'meripihka-low', hex: '#3a2810' },
+  ],
+  winter: [
+    { fi: 'teksti',     hex: '#dfd0b0' },
+    { fi: 'harmaa-lämmin', hex: '#8a7a60' },
+    { fi: 'harmaa',     hex: '#586070' },
+    { fi: 'viiva',      hex: '#222018' },
+    { fi: 'laatta',     hex: '#141210' },
+    { fi: 'tyhjyys',    hex: '#0c0c0c' },
+  ],
+  brief: [
+    { fi: 'taivas',     hex: '#80b8cc' },
+    { fi: 'järvi',      hex: '#3a7890' },
+    { fi: 'vihreä',     hex: '#90c830' },
+  ],
+  violet: [
+    { fi: 'violetti',       hex: '#702890' },
+    { fi: 'violetti-mid',   hex: '#4a1858' },
+    { fi: 'violetti-dim',   hex: '#280d30' },
+  ],
+  danger: [
+    { fi: 'vaara',      hex: '#e83820' },
+  ],
+};
+
+// 15-entry arc: void talvi → warming → kevät burst → winter returning
+// notch 0 = deepest dark,  10 = kevät,  14 = late winter return
+const DAY_COLORS = [
+  '#0c0c0c',  // 0  — tyhjyys
+  '#141210',  // 1  — laatta
+  '#222018',  // 2  — viiva
+  '#280d30',  // 3  — violetti-dim
+  '#586070',  // 4  — harmaa
+  '#4a1858',  // 5  — violetti-mid
+  '#702890',  // 6  — violetti
+  '#8a7a60',  // 7  — harmaa-lämmin
+  '#3a2810',  // 8  — meripihka-low
+  '#9a6820',  // 9  — meripihka-dim
+  '#80b8cc',  // 10 — taivas (kevät)
+  '#f5c060',  // 11 — hehku
+  '#f0a030',  // 12 — meripihka
+  '#dfd0b0',  // 13 — teksti
+  '#8a7a60',  // 14 — harmaa-lämmin (settling back)
+];
+
+let currentColor = DAY_COLORS[discordianDoy() % 15];
+let activeEl = null;
+
+function buildSwatches() {
+  Object.entries(PALETTE).forEach(([key, colors]) => {
+    const container = document.getElementById('swatches-' + key);
+    colors.forEach(c => {
+      const sw = document.createElement('div');
+      sw.className = 'swatch' + (c.hex === currentColor ? ' active' : '');
+      sw.innerHTML = `
+        <div class="swatch-dot" style="background:${c.hex}"></div>
+        <div class="swatch-info">
+          <span class="swatch-fi">${c.fi}</span>
+          <span class="swatch-hex">${c.hex}</span>
+        </div>`;
+      sw.addEventListener('click', () => {
+        currentColor = c.hex;
+        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        render();
+      });
+      if (c.hex === currentColor) activeEl = sw;
+      container.appendChild(sw);
+    });
+  });
+}
+
+const STATIONS = [
+  { key:'POH', sem:[315, 90]  },
+  { key:'VÄY', sem:[270, 90]  },
+  { key:'GRI', sem:[225, 90]  },
+  { key:'KAA', sem:[180, 90]  },
+  { key:'AAV', sem:[90,  135] },
+  { key:'HEH', sem:[90,  180] },
+  { key:'SOL', sem:[90,  225] },
+  { key:'TAI', sem:[90,  270] },
+];
+
+function drawBirch(canvas, leftDeg, rightDeg, opts) {
+  const { sz, droop, trunk, branchlet, color, rotation = 0 } = opts;
+  canvas.width  = sz;
+  canvas.height = sz;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, sz, sz);
+
+  ctx.save();
+  ctx.translate(sz / 2, sz / 2);
+  ctx.rotate(rotation * Math.PI / 180);
+  ctx.translate(-sz / 2, -sz / 2);
+
+  const cx    = sz / 2;
+  const forkY = sz * 0.52;
+  const baseY = forkY + sz * (trunk / 100);
+  const ARM   = sz * 0.40;
+
+  ctx.strokeStyle = color;
+  ctx.fillStyle   = color;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  ctx.lineWidth = sz * 0.028;
+  ctx.beginPath();
+  ctx.moveTo(cx, baseY);
+  ctx.lineTo(cx, forkY);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, forkY, sz * 0.022, 0, Math.PI * 2);
+  ctx.fill();
+
+  function branch(deg, bletSign) {
+    const rad  = (deg - 90) * Math.PI / 180;
+    const tipX = cx + ARM * Math.cos(rad);
+    const tipY = forkY + ARM * Math.sin(rad);
+    const cpX  = cx + ARM * 0.5 * Math.cos(rad);
+    const cpY  = forkY + ARM * 0.5 * Math.sin(rad) + ARM * (droop / 100);
+
+    ctx.lineWidth = sz * 0.022;
+    ctx.beginPath();
+    ctx.moveTo(cx, forkY);
+    ctx.quadraticCurveTo(cpX, cpY, tipX, tipY);
+    ctx.stroke();
+
+    if (branchlet) {
+      const t  = 0.6;
+      const bx = (1-t)*(1-t)*cx    + 2*(1-t)*t*cpX + t*t*tipX;
+      const by = (1-t)*(1-t)*forkY + 2*(1-t)*t*cpY + t*t*tipY;
+      const bletRad = rad + bletSign * 0.55;
+      ctx.lineWidth = sz * 0.013;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + ARM * 0.22 * Math.cos(bletRad),
+                 by + ARM * 0.22 * Math.sin(bletRad));
+      ctx.stroke();
+    }
+  }
+
+  branch(leftDeg,  +1);
+  branch(rightDeg, -1);
+  ctx.restore();
+}
+
+// ── AUDIO ────────────────────────────────────────────────────────────────────
+// startBirchAmbient: 13-minute koivuhuilu duo. doro malaia palette.
+// Congruent to 0.15Hz. 3-1-11 seasonal.
+// Minor pentatonic default. Phrygian blade enters gently in deep winter.
+// Deep winter descends and gets weird. It's syke.
+
+let audioCtx            = null;
+let birchAmbientStarted = false;
+const VOL_GAINS         = [0, 0.28, 0.70];
+let birchVol            = 1;          // 0 mute · 1 normal · 2 max
+let birchMaster         = null;
+let birchAmbientT0      = null;
+
+function discordianDoy() {
+  const now   = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now - start) / 86400000); // 1–365
+}
+
+const CURSOR_START = (discordianDoy() % 15) / 15;
+
+function tickCursor() {
+  if (!birchAmbientT0 || !audioCtx) return;
+  const elapsed  = audioCtx.currentTime - birchAmbientT0;
+  const progress = Math.min(elapsed / 780, 1);
+  const pct      = CURSOR_START + progress * (1 - CURSOR_START);
+  const cursor   = document.getElementById('season-cursor');
+  if (cursor) {
+    cursor.style.left = (pct * 100) + '%';
+    if (progress >= 1) {
+      cursor.classList.add('done');
+      return;
+    }
+  }
+  requestAnimationFrame(tickCursor);
+}
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!birchAmbientStarted) startBirchAmbient();
+  return audioCtx;
+}
+
+function setVol(n) {
+  birchVol = n;
+  [0,1,2].forEach(i =>
+    document.getElementById('vol-' + i).classList.toggle('active', i === n)
+  );
+  if (birchMaster && audioCtx)
+    birchMaster.gain.setTargetAtTime(VOL_GAINS[n], audioCtx.currentTime, 0.4);
+}
+
+function startBirchAmbient() {
+  birchAmbientStarted = true;
+  const ctx = audioCtx;
+  const t0  = ctx.currentTime + 2.0;
+  birchAmbientT0 = t0;
+  setTimeout(() => requestAnimationFrame(tickCursor), 2000);
+
+  birchMaster = ctx.createGain();
+  birchMaster.gain.value = VOL_GAINS[birchVol];
+  birchMaster.connect(ctx.destination);
+
+  // ── BREATH: filtered noise, 0.15Hz swell — the forest at rest ──────────
+  const nbLen  = ctx.sampleRate * 4;
+  const nbBuf  = ctx.createBuffer(1, nbLen, ctx.sampleRate);
+  const nbData = nbBuf.getChannelData(0);
+  for (let i = 0; i < nbLen; i++) nbData[i] = Math.random() * 2 - 1;
+  const nbSrc  = ctx.createBufferSource();
+  nbSrc.buffer = nbBuf; nbSrc.loop = true;
+  const nbFilt = ctx.createBiquadFilter();
+  nbFilt.type  = 'bandpass'; nbFilt.frequency.value = 340; nbFilt.Q.value = 0.4;
+  const nbGain = ctx.createGain(); nbGain.gain.value = 0.040;
+  const nbLFO  = ctx.createOscillator();
+  nbLFO.type   = 'sine'; nbLFO.frequency.value = 0.15;
+  const nbLFOg = ctx.createGain(); nbLFOg.gain.value = 0.022;
+  nbLFO.connect(nbLFOg); nbLFOg.connect(nbGain.gain);
+  nbSrc.connect(nbFilt); nbFilt.connect(nbGain); nbGain.connect(birchMaster);
+  nbSrc.start(t0); nbLFO.start(t0);
+
+  const endTime = t0 + 13 * 60;
+
+  // ── SHARED TREMOLO LFOs — two persistent oscillators, one per voice ─────
+  // Replaces per-note trem oscillator pairs (~210 oscillators → 2).
+  // All notes share the same breath phase — the forest breathes together.
+  // Voice depths differ (0.16 / 0.13) but frequency is identical (0.15Hz).
+  const sharedLFO = [ctx.createOscillator(), ctx.createOscillator()];
+  sharedLFO[0].type = sharedLFO[1].type = 'sine';
+  sharedLFO[0].frequency.value = sharedLFO[1].frequency.value = 0.15;
+  sharedLFO[0].start(t0); sharedLFO[0].stop(endTime + 2);
+  sharedLFO[1].start(t0); sharedLFO[1].stop(endTime + 2);
+
+  // ── KOIVUHUILU DUO ──────────────────────────────────────────────────────
+  // doro malaia palette: warm, dark, slightly flat (−8¢)
+  // Lookahead scheduler (Wilson 2013): schedules 30s ahead, wakes every 4s.
+
+  const FLAT = Math.pow(2, -8 / 1200);  // −8 cents — Taav carved it himself
+
+  const S = [
+     92.5, 110.0, 123.5, 138.6, 164.8,   // 0-4   F#2 A2 B2 C#3 E3
+    185.0, 220.0, 246.9, 277.2, 329.6,   // 5-9   F#3 A3 B3 C#4 E4
+    370.0, 440.0, 493.9, 554.4, 659.3,   // 10-14 F#4 A4 B4 C#5 E5
+    196.0, 392.0,                         // 15-16 G3 G4  [phrygian blade]
+    130.8, 261.6, 116.5, 155.6,          // 17-20 C3 C4 Bb2 Eb4  [weird]
+  ].map(f => f * FLAT);
+
+  const m3 = Math.pow(2,  3 / 12);  // minor third
+  const M3 = Math.pow(2,  4 / 12);  // major third
+  const P5 = Math.pow(2,  7 / 12);  // perfect fifth
+  const TT = Math.pow(2,  6 / 12);  // tritone
+  const m2 = Math.pow(2,  1 / 12);  // minor second
+
+  const SP_CUT = [580, 540, 560];
+  const SU_CUT = 660;
+
+  const CYCLES = [
+    {
+      sp:[12,11, 9], spD:[11,10,13], spI:[m3,m3,m3],
+      su:14,         suD:22,
+      pu:[ 9, 8, 7, 6, 5, 4, 3, 2,15,17, 0],
+      puD:[10,11,11,12,12,13,13,14,15,16,18],
+      puC:[490,450,420,390,360,320,280,250,222,195,170],
+      puI:[m3,m3,m3,m3,m3,M3,M3,m3,m3,m2,TT],
+    },
+    {
+      sp:[11, 9,12], spD:[10,12,11], spI:[m3,m3,m3],
+      su:13,         suD:24,
+      pu:[ 8, 7, 6, 5, 4, 3, 2, 1,15,18, 0],
+      puD:[10,10,11,12,12,13,14,14,15,17,19],
+      puC:[480,440,410,378,350,310,275,245,215,190,165],
+      puI:[m3,m3,m3,M3,M3,M3,m3,m3,m3,TT,m2],
+    },
+    {
+      sp:[10,12,11], spD:[12,10,11], spI:[m3,m3,M3],
+      su:14,         suD:21,
+      pu:[ 9, 8, 6, 5, 4, 3, 2, 1, 0,17,19],
+      puD:[10,11,11,12,13,13,14,15,15,17,20],
+      puC:[500,460,420,385,350,315,275,245,210,185,160],
+      puI:[m3,m3,m3,m3,M3,M3,M3,m3,m2,m2,TT],
+    },
+    {
+      sp:[13,11, 9], spD:[11,10,12], spI:[m3,m3,m3],
+      su:12,         suD:23,
+      pu:[ 9, 7, 6, 5, 4, 3, 2,15, 1,17, 0],
+      puD:[10,11,12,12,13,13,14,14,15,17,18],
+      puC:[495,450,415,380,345,310,270,240,210,188,162],
+      puI:[m3,m3,m3,M3,M3,m3,m3,m3,M3,m2,TT],
+    },
+    {
+      sp:[12,13,11], spD:[12,11,10], spI:[M3,m3,m3],
+      su:14,         suD:20,
+      pu:[ 8, 7, 5, 4, 3, 2, 1,15, 0,19,17],
+      puD:[11,11,12,12,13,14,14,15,16,17,19],
+      puC:[485,445,410,375,340,305,270,238,205,182,158],
+      puI:[m3,m3,M3,M3,m3,m3,m3,m3,m2,TT,m2],
+    },
+    {
+      sp:[ 9,11,13], spD:[10,12,11], spI:[m3,M3,m3],
+      su:12,         suD:22,
+      pu:[ 8, 6, 5, 4, 3, 2, 1, 0,15,17,18],
+      puD:[10,11,12,12,13,13,14,15,15,16,18],
+      puC:[490,455,420,385,350,315,278,248,215,190,165],
+      puI:[m3,m3,m3,M3,M3,m3,m3,m2,m3,TT,m3],
+    },
+    {
+      sp:[11,12, 9], spD:[11,10,13], spI:[m3,m3,M3],
+      su:13,         suD:23,
+      pu:[ 9, 7, 6, 5, 4, 3,15, 2, 1, 0,17],
+      puD:[10,11,11,12,13,13,14,14,15,17,20],
+      puC:[495,458,422,388,355,318,280,245,212,188,163],
+      puI:[m3,m3,m3,m3,M3,m3,m3,M3,m2,TT,m2],
+    },
+  ];
+
+  function vary(base) { return base * (0.82 + Math.random() * 0.38); }
+
+  // Pre-compute event timeline — timing and pitch decided now, nodes later.
+  const events = [];
+  let t = t0;
+  let c = 0;
+  while (t < endTime - 30) {
+    const cyc = CYCLES[c % CYCLES.length];
+    for (let i = 0; i < 3 && t < endTime - 30; i++) {
+      const dur = vary(cyc.spD[i]);
+      events.push({ t, freq: S[cyc.sp[i]], dur, cutoff: SP_CUT[i], intv: cyc.spI[i] });
+      t += dur * 0.82;
+    }
+    if (t < endTime - 30) {
+      const dur = vary(cyc.suD);
+      events.push({ t, freq: S[cyc.su], dur, cutoff: SU_CUT, intv: P5 });
+      t += dur * 0.82;
+    }
+    for (let i = 0; i < 11 && t < endTime - 30; i++) {
+      const dur = vary(cyc.puD[i]);
+      events.push({ t, freq: S[cyc.pu[i]], dur, cutoff: cyc.puC[i], intv: cyc.puI[i] });
+      t += dur * 0.82;
+    }
+    c++;
+  }
+
+  birchMaster.gain.setValueAtTime(VOL_GAINS[birchVol], endTime - 30);
+  if (birchVol > 0) birchMaster.gain.linearRampToValueAtTime(0, endTime);
+
+  const LOOKAHEAD = 30.0;
+  const TICK      = 4000;
+  let ei = 0;
+
+  function scheduleNote(ev) {
+    const { t: st, freq, dur, cutoff, intv } = ev;
+    const fade = Math.min(0.85, dur * 0.22);
+    [freq, freq * intv].forEach((f, vi) => {
+      const depth = vi === 1 ? 0.13 : 0.16;
+
+      const osc  = ctx.createOscillator();
+      osc.type   = 'sine';
+      osc.frequency.value = f;
+
+      const filt = ctx.createBiquadFilter();
+      filt.type  = 'lowpass';
+      filt.frequency.value = cutoff * (vi === 1 ? 0.88 : 1.0);
+      filt.Q.value = 1.6;
+
+      const env  = ctx.createGain();
+      env.gain.setValueAtTime(0, st);
+      env.gain.linearRampToValueAtTime(0.20, st + fade);
+      env.gain.setValueAtTime(0.20, st + dur - fade * 0.65);
+      env.gain.linearRampToValueAtTime(0, st + dur);
+
+      // Shared LFO tremolo — one tScale gain per voice per note.
+      // sharedLFO[vi] is a persistent 0.15Hz oscillator; no new osc per note.
+      const tGain  = ctx.createGain(); tGain.gain.value = 1.0;
+      const tScale = ctx.createGain(); tScale.gain.value = depth;
+      sharedLFO[vi].connect(tScale); tScale.connect(tGain.gain);
+
+      osc.connect(filt); filt.connect(env); env.connect(tGain); tGain.connect(birchMaster);
+      osc.start(st);
+      osc.stop(st + dur + 0.1);
+      osc.onended = () => {
+        osc.disconnect(); filt.disconnect(); env.disconnect(); tGain.disconnect();
+        // tScale → tGain.gain connection clears when tGain is GC'd
+      };
+    });
+  }
+
+  function tick() {
+    if (!audioCtx) return;
+    const until = audioCtx.currentTime + LOOKAHEAD;
+    while (ei < events.length && events[ei].t < until) {
+      scheduleNote(events[ei++]);
+    }
+    if (ei < events.length) setTimeout(tick, TICK);
+  }
+
+  setTimeout(tick, 0);
+}
+
+function seasonOf(hex) {
+  for (const [season, colors] of Object.entries(PALETTE)) {
+    if (colors.some(c => c.hex === hex)) return season;
+  }
+  return 'amber';
+}
+
+// gain, bandpass freq, decay exponent
+const SEASON_PARAMS = {
+  amber:  { gain: 0.28, freq:  600, exp: 6 },
+  winter: { gain: 0.07, freq:  120, exp: 9 },
+  brief:  { gain: 0.55, freq: 1400, exp: 4 },
+  violet: { gain: 0.05, freq:   90, exp: 10 },
+  danger: { gain: 0.42, freq:  900, exp: 4 },
+};
+
+function playClick() {
+  const ctx    = getAudioCtx();
+  const p      = SEASON_PARAMS[seasonOf(currentColor)] || SEASON_PARAMS.amber;
+  const dur    = 0.14;
+  const len    = Math.floor(ctx.sampleRate * dur);
+  const buf    = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data   = buf.getChannelData(0);
+
+  for (let i = 0; i < len; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, p.exp);
+  }
+
+  const src          = ctx.createBufferSource();
+  src.buffer         = buf;
+
+  const filter       = ctx.createBiquadFilter();
+  filter.type        = 'bandpass';
+  filter.frequency.value = p.freq;
+  filter.Q.value     = 0.8;
+
+  const gain         = ctx.createGain();
+  gain.gain.value    = p.gain;
+
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  src.start();
+}
+
+// ── FINNISH COUNTING ────────────────────────────────────────────────────────
+const FI_ONES  = ['','yksi','kaksi','kolme','neljä','viisi','kuusi','seitsemän','kahdeksan','yhdeksän'];
+const FI_TEENS = ['kymmenen','yksitoista','kaksitoista','kolmetoista','neljätoista',
+                  'viisitoista','kuusitoista','seitsemäntoista','kahdeksantoista','yhdeksäntoista'];
+const FI_TENS  = ['','','kaksikymmentä','kolmekymmentä','neljäkymmentä','viisikymmentä',
+                  'kuusikymmentä','seitsemänkymmentä','kahdeksankymmentä','yhdeksänkymmentä'];
+
+function toFinnish(n) {
+  if (n === 0)   return 'nolla';
+  if (n < 10)    return FI_ONES[n];
+  if (n < 20)    return FI_TEENS[n - 10];
+  if (n < 100) {
+    const tens = FI_TENS[Math.floor(n / 10)];
+    const ones = FI_ONES[n % 10];
+    return ones ? tens + ones : tens;
+  }
+  if (n < 200) {
+    const rest = n - 100;
+    return rest === 0 ? 'sata' : 'sata' + toFinnish(rest);
+  }
+  const hundreds = FI_ONES[Math.floor(n / 100)];
+  const rest = n % 100;
+  return rest === 0 ? hundreds + 'sataa' : hundreds + 'sataa' + toFinnish(rest);
+}
+
+// ── PUZZLE STATE ────────────────────────────────────────────────────────────
+// target: the random destination sequence (8 station indices, order matters)
+// puzzle: the 3×3 grid state (8 indices + null). Victory = puzzle matches target + null at [8]
+let target     = [0, 1, 2, 3, 4, 5, 6, 7];
+let puzzle     = [...target, null];
+let alreadyWon = false;
+let moveCount  = 0;
+
+// Fixed rendering params for the scrabble tray — the fixture, not the slider state
+const TRAY_PARAMS = { sz: 52, droop: 11, trunk: 31, branchlet: 1, rotation: 0, color: '#f0a030' };
+
+function emptyPos() { return puzzle.indexOf(null); }
+
+function canSlide(pos) {
+  const e  = emptyPos();
+  const dr = Math.abs(Math.floor(pos / 3) - Math.floor(e / 3));
+  const dc = Math.abs((pos % 3) - (e % 3));
+  return (dr + dc) === 1;
+}
+
+function slide(pos) {
+  if (!canSlide(pos)) return;
+  const e = emptyPos();
+  puzzle[e] = puzzle[pos];
+  puzzle[pos] = null;
+  moveCount++;
+  document.getElementById('move-n').textContent  = moveCount;
+  document.getElementById('move-fi').textContent = toFinnish(moveCount);
+  playClick();
+  render();
+}
+
+function randomTarget() {
+  const arr = [0, 1, 2, 3, 4, 5, 6, 7];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderScrabbleTray() {
+  const tray = document.getElementById('scrabble-tray');
+  tray.innerHTML = '';
+  tray.classList.remove('victory');
+  target.forEach(stIdx => {
+    const st   = STATIONS[stIdx];
+    const tile = document.createElement('div');
+    tile.className = 'scrabble-tile';
+    const canvas = document.createElement('canvas');
+    drawBirch(canvas, st.sem[0], st.sem[1], TRAY_PARAMS);
+    const lbl = document.createElement('div');
+    lbl.className   = 'lbl';
+    lbl.textContent = st.key;
+    tile.appendChild(canvas);
+    tile.appendChild(lbl);
+    tray.appendChild(tile);
+  });
+}
+
+function resetPuzzle() {
+  target     = randomTarget();
+  alreadyWon = false;
+  renderScrabbleTray();
+  // Start from target-solved state, then random walk — guarantees solvability
+  puzzle = [...target, null];
+  let lastEmpty = -1;
+  for (let i = 0; i < 300; i++) {
+    const e = emptyPos();
+    const candidates = [];
+    for (let p = 0; p < 9; p++) {
+      if (p !== lastEmpty && canSlide(p)) candidates.push(p);
+    }
+    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    lastEmpty = e;
+    puzzle[e] = puzzle[pick];
+    puzzle[pick] = null;
+  }
+  moveCount = 0;
+  document.getElementById('move-n').textContent  = '0';
+  document.getElementById('move-fi').textContent = 'nolla';
+  document.getElementById('solved-msg').classList.remove('visible');
+  render();
+}
+
+function isSolved() {
+  for (let i = 0; i < 8; i++) if (puzzle[i] !== target[i]) return false;
+  return puzzle[8] === null;
+}
+
+function playVictory() {
+  const ctx = getAudioCtx();
+  const t   = ctx.currentTime;
+  // Rising triangle arpeggio — kevät/kesä register, three notes, mildly supportive
+  [2200, 2800, 3500].forEach((freq, i) => {
+    const delay = i * 0.13;
+    [freq, freq * 1.004].forEach(f => {
+      const osc = ctx.createOscillator();
+      const env = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      env.gain.setValueAtTime(0, t + delay);
+      env.gain.linearRampToValueAtTime(0.18, t + delay + 0.01);
+      env.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.9);
+      osc.connect(env);
+      env.connect(ctx.destination);
+      osc.start(t + delay);
+      osc.stop(t + delay + 1.0);
+    });
+  });
+}
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  const sz        = parseInt(document.getElementById('sz').value);
+  const droop     = parseInt(document.getElementById('droop').value);
+  const trunk     = parseInt(document.getElementById('trunk').value);
+  const branchlet = parseInt(document.getElementById('blet').value);
+  const rotation  = parseInt(document.getElementById('rot').value);
+
+  document.getElementById('szval').textContent    = sz;
+  document.getElementById('droopval').textContent = droop + '%';
+  document.getElementById('trunkval').textContent = trunk + '%';
+  document.getElementById('bletval').textContent  = branchlet ? 'on' : 'off';
+  document.getElementById('rotval').textContent   = rotation + '°';
+
+  const tray = document.getElementById('tray');
+  tray.innerHTML = '';
+
+  puzzle.forEach((stIdx, pos) => {
+    if (stIdx === null) {
+      // empty cell — sized to match a tile
+      const empty = document.createElement('div');
+      empty.className = 'tile-empty';
+      empty.style.width  = (sz + 22) + 'px';  // canvas + padding×2 + border
+      empty.style.height = (sz + 22 + 14 + 6) + 'px'; // + label + gap
+      tray.appendChild(empty);
+      return;
+    }
+
+    const st   = STATIONS[stIdx];
+    const tile = document.createElement('div');
+    tile.className = 'tile' + (canSlide(pos) ? ' slideable' : '');
+
+    const canvas = document.createElement('canvas');
+    drawBirch(canvas, st.sem[0], st.sem[1], { sz, droop, trunk, branchlet, color: currentColor, rotation });
+
+    const lbl = document.createElement('div');
+    lbl.className   = 'lbl';
+    lbl.textContent = st.key;
+
+    tile.appendChild(canvas);
+    tile.appendChild(lbl);
+    tile.addEventListener('click', () => slide(pos));
+    tray.appendChild(tile);
+  });
+
+  // highlight correct positions in destination tray
+  document.querySelectorAll('#scrabble-tray .scrabble-tile').forEach((tile, i) => {
+    tile.classList.toggle('correct', puzzle[i] === target[i]);
+  });
+
+  const won     = isSolved();
+  const solvedEl = document.getElementById('solved-msg');
+  solvedEl.classList.toggle('visible', won);
+  document.getElementById('scrabble-tray').classList.toggle('victory', won);
+  if (won && !alreadyWon) {
+    alreadyWon = true;
+    playVictory();
+  }
+}
+
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', render));
+document.getElementById('btn-shuffle').addEventListener('click', resetPuzzle);
+buildSwatches();
+resetPuzzle();
+</script>
+</body>
+</html>

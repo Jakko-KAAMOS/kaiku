@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="James McGill">
+  <meta name="copyright" content="Copyright © McGill Enterprises 2026. All rights reserved.">
+  <title>kuule — kaamos</title>
+  <style>
+    /* ─── PALETTE ──────────────────────────────────────────────────────────── */
+
+    :root {
+      --bg:           #0c0c0c;
+      --bg-raised:    #141210;
+      --bg-inset:     #181614;
+      --border-dim:   #201e18;
+      --border:       #2e2418;
+
+      --amber:        #f0a030;
+      --amber-mid:    #9a6820;
+      --amber-dim:    #5a3810;
+      --amber-ghost:  #3a2010;
+
+      --violet:       #702890;
+      --violet-mid:   #4a1858;
+      --violet-dim:   #280d30;
+
+      --green:        #90c830;
+      --danger:       #e83820;
+
+      --text:         #dfd0b0;
+      --text-sub:     #8a7a60;
+      --text-muted:   #4a4030;
+
+      --font-mono:    'Courier New', Courier, monospace;
+      --pulse:        6.67s;
+    }
+
+    /* Dev theme: slightly elevated background, brighter type */
+    html[data-theme="dev"] {
+      --bg:        #141210;
+      --bg-raised: #1c1a16;
+      --bg-inset:  #201e18;
+    }
+
+    /* ─── RESET ────────────────────────────────────────────────────────────── */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 2.5rem;
+      gap: 1rem;
+    }
+
+    /* ─── HEADER ───────────────────────────────────────────────────────────── */
+
+    .page-header {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .wordmark {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: lowercase;
+      color: var(--amber);
+      animation: hpulse var(--pulse) ease-in-out infinite;
+    }
+
+    .version-link {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      min-width: 4ch;
+      text-align: right;
+      text-decoration: none;
+    }
+
+    .version-link:hover { color: var(--amber-mid); }
+
+    @keyframes hpulse {
+      0%, 100% { opacity: 0.35; }
+      50%       { opacity: 1.0;  }
+    }
+
+    /* ─── MUTE BUTTONS ─────────────────────────────────────────────────────── */
+
+    .mute-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: baseline;
+    }
+
+    .mute-btn {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: lowercase;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .mute-btn:hover          { color: var(--amber-mid); }
+    .mute-btn.muted          { color: var(--amber-dim); text-decoration: line-through; }
+    .mute-btn.green          { color: var(--green); }
+
+    /* ─── CANVAS ───────────────────────────────────────────────────────────── */
+
+    .canvas-wrap {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-dim);
+      line-height: 0;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    canvas.watching { cursor: default; }
+
+    /* ─── STATUS ───────────────────────────────────────────────────────────── */
+
+    .status-line {
+      width: 100%;
+      max-width: 560px;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      min-height: 1em;
+      text-align: center;
+      text-transform: lowercase;
+    }
+
+    .status-line.alert  { color: var(--danger); }
+    .status-line.violet { color: var(--violet); }
+    .status-line.ready  { color: var(--amber);  opacity: 0.6; }
+
+    /* ─── GLYPH TRAY ───────────────────────────────────────────────────────── */
+
+    .glyph-wrap {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .glyph-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .glyph-tray {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      min-height: 58px;
+      padding: 0.4rem;
+      background: var(--bg-raised);
+      border: 1px solid var(--border-dim);
+      align-items: flex-start;
+    }
+
+    .glyph-tile {
+      width: 104px;
+      height: 122px;
+      background: var(--bg-inset);
+      border: 1px solid var(--amber-dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      position: relative;
+      transition: border-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .glyph-tile.fresh {
+      border-color: var(--amber-mid);
+      box-shadow: 0 0 10px rgba(240,160,48,0.15);
+    }
+
+    .glyph-sprite {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 28px;
+      height: 28px;
+    }
+
+    .glyph-key {
+      font-size: 7px;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .glyph-n {
+      position: absolute;
+      top: 2px;
+      right: 3px;
+      font-size: 6px;
+      color: var(--text-muted);
+      opacity: 0.45;
+    }
+
+    .tray-empty {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      align-self: center;
+      padding: 0 0.25rem;
+    }
+
+    /* ─── SEQUENCE COUNTER ────────────────────────────────────────────────── */
+
+    .seq-count {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .seq-n {
+      font-size: 2rem;
+      color: var(--amber);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .seq-fi {
+      font-size: 0.65rem;
+      color: var(--text);
+      letter-spacing: 0.18em;
+    }
+
+    .seq-best {
+      font-size: 0.52rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      min-height: 1em;
+    }
+
+    /* ─── LOG ──────────────────────────────────────────────────────────────── */
+
+    .log-line {
+      width: 100%;
+      max-width: 560px;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      text-align: right;
+      min-height: 1em;
+      transition: color 0.6s ease;
+    }
+
+    /* ─── DISCORDIAN DATE ─────────────────────────────────────────────────── */
+
+    .disc-date {
+      width: 100%;
+      max-width: 560px;
+      margin-top: 0.5rem;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .disc-en {
+      font-size: 0.52rem;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .disc-km {
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      color: var(--amber-dim);
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────────────────────── */
+
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.75rem 2rem; }
+      .glyph-tile { width: 72px; height: 88px; }
+      .glyph-char { font-size: 18px; }
+    }
+
+  </style>
+<link rel="icon" id="favicon" type="image/svg+xml" href="">
+<script src="/favicon.js"></script>
+</head>
+<body>
+
+<header class="page-header">
+  <span class="wordmark" title="listen">kuule</span>
+  <div class="mute-controls">
+    <button class="mute-btn" id="btn-vayla"    onclick="toggleVayla()" title="channel — mutes the hex tones">väylä</button>
+    <button class="mute-btn" id="btn-syke"     onclick="toggleSyke()"  title="pulse — mutes the drone">syke</button>
+    <button class="mute-btn" id="btn-mode" onclick="toggleMode()" title="child's play — new station always last">lasten leikkiä</button>
+    <button class="mute-btn green" id="btn-reg" onclick="toggleRegister()" title="register — tone color">rekisteri</button>
+  </div>
+  <a class="version-link" id="dev-readout" href="https://github.com/jmcgill-public/kaiku/blob/main/README.md" target="_blank" rel="noopener" title="v0.1 — grilli name for what's currently shipping">frites</a>
+</header>
+
+<div class="canvas-wrap">
+  <canvas id="grid" width="540" height="540"></canvas>
+</div>
+
+<div class="status-line" id="status"></div>
+
+<div class="glyph-wrap">
+  <div class="seq-count">
+    <span class="seq-n"  id="seq-n">0</span>
+    <span class="seq-fi" id="seq-fi">nolla</span>
+    <span class="seq-best" id="seq-best"></span>
+  </div>
+  <span class="glyph-label">sequence record</span>
+  <div class="glyph-tray" id="glyph-tray">
+    <span class="tray-empty" id="tray-empty">—</span>
+  </div>
+</div>
+
+<div class="log-line" id="log-line"></div>
+
+<div class="disc-date">
+  <div class="disc-en" id="disc-en"></div>
+  <div class="disc-km" id="disc-km"></div>
+</div>
+
+<script>
+
+// ─── DEV MODE ──────────────────────────────────────────────────────────────
+
+(function () {
+  const p = new URLSearchParams(location.search);
+  if (p.get('dev') === '1') sessionStorage.setItem('kaamos-dev', '1');
+  if (p.get('dev') === '0') sessionStorage.removeItem('kaamos-dev');
+  if (sessionStorage.getItem('kaamos-dev') === '1')
+    document.documentElement.setAttribute('data-theme', 'dev');
+})();
+
+const DEV = document.documentElement.getAttribute('data-theme') === 'dev';
+
+// ─── HEX MATH ──────────────────────────────────────────────────────────────
+
+const DIR = [
+  {q:1,r:-1,s:0}, {q:1,r:0,s:-1}, {q:0,r:1,s:-1},
+  {q:-1,r:1,s:0}, {q:-1,r:0,s:1}, {q:0,r:-1,s:1},
+];
+
+const hexKey       = h => `${h.q},${h.r},${h.s}`;
+const hexAdd       = (a,b) => ({q:a.q+b.q, r:a.r+b.r, s:a.s+b.s});
+const hexNeighbors = h => DIR.map(d => hexAdd(h, d));
+
+function hexToPixel(h, size, origin) {
+  return {
+    x: origin.x + size * (3/2 * h.q),
+    y: origin.y + size * (Math.sqrt(3)/2 * h.q + Math.sqrt(3) * h.r),
+  };
+}
+
+function pixelToHex(px, py, size, origin) {
+  const x = (px - origin.x) / size;
+  const y = (py - origin.y) / size;
+  const q = (2/3) * x;
+  const r = (-1/3) * x + (Math.sqrt(3)/3) * y;
+  const s = -q - r;
+  return hexRound({q, r, s});
+}
+
+function hexRound(h) {
+  let q = Math.round(h.q), r = Math.round(h.r), s = Math.round(h.s);
+  const dq = Math.abs(q-h.q), dr = Math.abs(r-h.r), ds = Math.abs(s-h.s);
+  if      (dq > dr && dq > ds) q = -r-s;
+  else if (dr > ds)            r = -q-s;
+  else                         s = -q-r;
+  return {q, r, s};
+}
+
+function bfsPath(start, end, valid) {
+  const sk = hexKey(start), ek = hexKey(end);
+  if (sk === ek) return [start];
+  const queue = [[start]], visited = new Set([sk]);
+  while (queue.length) {
+    const path = queue.shift();
+    const cur  = path[path.length - 1];
+    for (const n of hexNeighbors(cur)) {
+      const nk = hexKey(n);
+      if (nk === ek) return [...path, n];
+      if (!visited.has(nk) && valid.has(nk)) {
+        visited.add(nk);
+        queue.push([...path, n]);
+      }
+    }
+  }
+  return [start, end];
+}
+
+// ─── MAP ───────────────────────────────────────────────────────────────────
+
+const HILJAISUUS = {q:0, r:0, s:0};
+
+// sem: [leftArmDeg, rightArmDeg] — angles from 12 o'clock, clockwise.
+// These are real flag semaphore positions for letters A–H.
+// The player is reading a cipher and doesn't know it yet.
+
+// FUTURE: station labels need to be semantic and connect to the mastermind mechanic.
+// The Mastermind read: each station should carry meaning about sequence position
+// or deduction state — not just names. Birch branches considered as visual form.
+// Current names (Pohja, Väylä, etc.) are good and stay until the semantic layer is ready.
+
+const STATIONS = [
+  { key:'POH', name:'Pohja',  hex:{q:2,  r:-1, s:-1}, sem:[315,  90] }, // A
+  { key:'VÄY', name:'Väylä',  hex:{q:1,  r:-2, s:1},  sem:[270,  90] }, // B
+  { key:'GRI', name:'Grilli', hex:{q:-1, r:-1, s:2},  sem:[225,  90] }, // C
+  { key:'KAA', name:'Kaamos', hex:{q:-2, r:1,  s:1},  sem:[180,  90] }, // D
+  { key:'AAV', name:'Aava',   hex:{q:-1, r:2,  s:-1}, sem:[ 90, 135] }, // E
+  { key:'HEH', name:'Hehku',  hex:{q:1,  r:1,  s:-2}, sem:[ 90, 180] }, // F
+  { key:'SOL', name:'Solmu',  hex:{q:2,  r:-2, s:0},  sem:[ 90, 225] }, // G
+  { key:'TAI', name:'Taivas', hex:{q:0,  r:-2, s:2},  sem:[ 90, 270] }, // H
+];
+
+const stationByKey = {};
+STATIONS.forEach(s => { stationByKey[hexKey(s.hex)] = s; });
+
+const allHexes = new Set([hexKey(HILJAISUUS)]);
+STATIONS.forEach(s => allHexes.add(hexKey(s.hex)));
+for (let q = -2; q <= 2; q++) {
+  for (let r = -2; r <= 2; r++) {
+    const s = -q - r;
+    if (Math.abs(s) <= 2) allHexes.add(hexKey({q, r, s}));
+  }
+}
+
+// ─── SEMAPHORE RENDERER ────────────────────────────────────────────────────
+// Each glyph is two arm angles drawn on a small canvas.
+// Angles in degrees from 12 o'clock, clockwise. Pure geometry, no font.
+
+// Birch branch glyphs — tuned: size=127, droop=11%, trunk=31%, branchlet=on
+// Angles are the same semaphore encoding underneath; the shape is the tree.
+function drawSemaphore(canvas, leftDeg, rightDeg, color) {
+  const sz    = canvas.width;
+  const ctx   = canvas.getContext('2d');
+  ctx.clearRect(0, 0, sz, sz);
+
+  const cx     = sz / 2;
+  const forkY  = sz * 0.52;
+  const baseY  = forkY + sz * 0.31;   // trunk = 31%
+  const ARM    = sz * 0.40;
+  const DROOP  = 0.11;                // droop = 11%
+
+  ctx.strokeStyle = color;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  // trunk
+  ctx.lineWidth = sz * 0.028;
+  ctx.beginPath();
+  ctx.moveTo(cx, baseY);
+  ctx.lineTo(cx, forkY);
+  ctx.stroke();
+
+  // fork node
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, forkY, sz * 0.022, 0, Math.PI * 2);
+  ctx.fill();
+
+  function branch(deg, bletSign) {
+    const rad  = (deg - 90) * Math.PI / 180;
+    const tipX = cx + ARM * Math.cos(rad);
+    const tipY = forkY + ARM * Math.sin(rad);
+    const cpX  = cx + ARM * 0.5 * Math.cos(rad);
+    const cpY  = forkY + ARM * 0.5 * Math.sin(rad) + ARM * DROOP;
+
+    ctx.lineWidth = sz * 0.022;
+    ctx.beginPath();
+    ctx.moveTo(cx, forkY);
+    ctx.quadraticCurveTo(cpX, cpY, tipX, tipY);
+    ctx.stroke();
+
+    // branchlet at ~60% out
+    const t   = 0.6;
+    const bx  = (1-t)*(1-t)*cx  + 2*(1-t)*t*cpX  + t*t*tipX;
+    const by  = (1-t)*(1-t)*forkY + 2*(1-t)*t*cpY + t*t*tipY;
+    const bletRad = rad + bletSign * 0.55;
+    ctx.lineWidth = sz * 0.013;
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(bx + ARM * 0.22 * Math.cos(bletRad),
+               by + ARM * 0.22 * Math.sin(bletRad));
+    ctx.stroke();
+  }
+
+  branch(leftDeg,  +1);
+  branch(rightDeg, -1);
+}
+
+// ─── HIGHLIGHT — hold-then-decay ───────────────────────────────────────────
+// Hex illuminates for HOLD ms, then fades linearly over FADE ms.
+
+const HL = { hex: null, t0: 0, HOLD: 900, FADE: 500 };
+
+function hlSet(hex) { HL.hex = hex; HL.t0 = Date.now(); seasonalSound(); }
+
+function hlAlpha() {
+  if (!HL.hex) return 0;
+  const el = Date.now() - HL.t0;
+  if (el < HL.HOLD) return 1.0;
+  const f = (el - HL.HOLD) / HL.FADE;
+  if (f >= 1.0) { HL.hex = null; return 0; }
+  return 1.0 - f;
+}
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+
+// Finnish numbers — quietly taught, never announced
+const FI = [
+  'nolla', 'yksi', 'kaksi', 'kolme', 'neljä',
+  'viisi', 'kuusi', 'seitsemän', 'kahdeksan', 'yhdeksän',
+  'kymmenen', 'yksitoista', 'kaksitoista', 'kolmetoista', 'neljätoista',
+  'viisitoista', 'kuusitoista', 'seitsemäntoista', 'kahdeksantoista', 'yhdeksäntoista',
+];
+
+const STATE = {
+  phase:       'idle',
+  sequence:    [],
+  progress:    0,
+  round:       0,
+  trail:       [],
+  glyphs:      [],
+  disruptions: 0,
+  playerHex:   STATIONS[Math.floor(Math.random() * STATIONS.length)].hex,
+};
+
+// ─── CANVAS ────────────────────────────────────────────────────────────────
+
+const canvas = document.getElementById('grid');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const ORIGIN = {x: W/2, y: H/2};
+const HEX_SIZE = 44;
+
+function hexCorners(center, size) {
+  const c = [];
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 180 * (60 * i);
+    c.push({x: center.x + size * Math.cos(a), y: center.y + size * Math.sin(a)});
+  }
+  return c;
+}
+
+function fillHex(hex, fill, stroke, lw) {
+  const center  = hexToPixel(hex, HEX_SIZE, ORIGIN);
+  const corners = hexCorners(center, HEX_SIZE - 2);
+  ctx.beginPath();
+  ctx.moveTo(corners[0].x, corners[0].y);
+  for (let i = 1; i < 6; i++) ctx.lineTo(corners[i].x, corners[i].y);
+  ctx.closePath();
+  ctx.fillStyle   = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth   = lw || 1;
+  ctx.stroke();
+}
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Void grid tiles
+  allHexes.forEach(k => {
+    const [q, r, s] = k.split(',').map(Number);
+    fillHex({q, r, s}, '#0d0d12', '#18182a', 1);
+  });
+
+  // Trail (BFS path, faint violet)
+  if (STATE.trail.length > 1) {
+    ctx.save();
+    for (let i = 1; i < STATE.trail.length; i++) {
+      const a = hexToPixel(STATE.trail[i-1], HEX_SIZE, ORIGIN);
+      const b = hexToPixel(STATE.trail[i],   HEX_SIZE, ORIGIN);
+      const alpha = 0.06 + (i / STATE.trail.length) * 0.22;
+      ctx.strokeStyle = `rgba(112,40,144,${alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Hiljaisuus — violet pulse at 6.67s
+  const p = 0.5 + 0.5 * Math.sin(Date.now() / (6670 / (2 * Math.PI)));
+  fillHex(
+    HILJAISUUS,
+    `rgba(28,0,48,${0.8 + p * 0.2})`,
+    `rgba(112,40,144,${0.25 + p * 0.75})`,
+    2
+  );
+  const hc = hexToPixel(HILJAISUUS, HEX_SIZE, ORIGIN);
+  ctx.fillStyle   = `rgba(112,40,144,${0.2 + p * 0.5})`;
+  ctx.font        = '8px Courier New';
+  ctx.textAlign   = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('hiljaisuus', hc.x, hc.y);
+
+  // Station hexes
+  const hlA = hlAlpha();
+  const hlK = HL.hex ? hexKey(HL.hex) : null;
+
+  STATIONS.forEach(s => {
+    const k        = hexKey(s.hex);
+    const isHL     = k === hlK && hlA > 0;
+    const isPlayer = k === hexKey(STATE.playerHex);
+
+    let fill   = '#0f0f1e';
+    let stroke = '#22224a';
+    let lw     = 1;
+
+    if (isHL) {
+      fill   = `rgba(80,50,12,${0.3 + hlA * 0.6})`;
+      stroke = `rgba(240,160,48,${0.4 + hlA * 0.6})`;
+      lw     = 1 + hlA * 1.5;
+    } else if (isPlayer) {
+      fill   = '#0e1820';
+      stroke = '#3a7890';
+      lw     = 1.5;
+    }
+
+    fillHex(s.hex, fill, stroke, lw);
+
+    // Radial glow when highlighted
+    if (isHL && hlA > 0.05) {
+      const center  = hexToPixel(s.hex, HEX_SIZE, ORIGIN);
+      const corners = hexCorners(center, HEX_SIZE - 2);
+      const grad = ctx.createRadialGradient(
+        center.x, center.y, 0,
+        center.x, center.y, HEX_SIZE * 0.8
+      );
+      grad.addColorStop(0, `rgba(240,160,48,${hlA * 0.3})`);
+      grad.addColorStop(1, 'rgba(240,160,48,0)');
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(corners[0].x, corners[0].y);
+      for (let i = 1; i < 6; i++) ctx.lineTo(corners[i].x, corners[i].y);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Label
+    const center = hexToPixel(s.hex, HEX_SIZE, ORIGIN);
+    const keyColor = isHL
+      ? `rgba(240,160,48,${0.55 + hlA * 0.45})`
+      : isPlayer ? '#4888a0' : '#2a2858';
+    ctx.fillStyle    = keyColor;
+    ctx.font         = '9px Courier New';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.key, center.x, center.y + (DEV ? -5 : 0));
+
+    if (DEV) {
+      ctx.fillStyle    = `rgba(74,64,48,${isHL ? 0.9 : 0.6})`;
+      ctx.font         = '7px Courier New';
+      ctx.fillText(s.name, center.x, center.y + 6);
+    }
+  });
+
+  // ── Season ring scrobble ─────────────────────────────────────────────────
+  // 11 segments, counterclockwise from top. Entry = SEASON_START. Current = lit.
+  // Mapped to the inner hex ring — radius = HEX_SIZE * √3. Through glass.
+  {
+    const cx  = ORIGIN.x;
+    const cy  = ORIGIN.y;
+    const r   = HEX_SIZE * Math.sqrt(3);
+    const seg = NUM_SEASONS;
+    const arc = (2 * Math.PI) / seg;
+    const cur = currentSeasonIndex();
+
+    // Season colors: kevät amber, kesä bright, talvi sliding to violet-dim
+    const segColors = [
+      '#9a6820', '#c07828', '#f0a030',  // 0-2 kevät
+      '#f5c060',                          // 3 kesä
+      '#7a6050', '#604858', '#4a3858',   // 4-6 talvi early
+      '#3a2848', '#2a1838', '#1e1028',   // 7-9 talvi deep
+      '#280d30',                          // 10 hiljaisuus
+    ];
+
+    // Rotate the whole dial so today's SEASON_START sits at the top.
+    const dialOffset = SEASON_START * arc;
+
+    ctx.save();
+    for (let i = 0; i < seg; i++) {
+      // Counterclockwise: start at top (-π/2), rotated by today's Discordian date.
+      const startA = -Math.PI / 2 - i * arc - dialOffset;
+      const endA   = startA - arc + 0.03;  // 0.03 gap — tighter at larger radius
+
+      const isPast    = i < cur;
+      const isCurrent = i === cur;
+
+      let color, lw;
+      if (isCurrent) {
+        color = segColors[i];
+        lw    = 4;
+        ctx.globalAlpha = 0.72;
+      } else if (isPast) {
+        color = segColors[i];
+        lw    = 2;
+        ctx.globalAlpha = 0.22;
+      } else {
+        color = '#1a1820';
+        lw    = 2;
+        ctx.globalAlpha = 0.18;
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startA, endA, true);
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = lw;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+  }
+
+  requestAnimationFrame(render);
+}
+
+// ─── AUDIO ─────────────────────────────────────────────────────────────────
+// Seasonal register by sequence length.
+// Spring (1–3): bright triangle tones, subtle decay gradient — almost the same, legible.
+// Summer (4): same register, long decay — the one day, it hangs in the air.
+// Purple descent (5–8): frequency and gain slide toward tingsha/hiljaisuus.
+// Error: vaara — the anvil. Wile E. Coyote. From above. Once.
+
+let audioCtx      = null;
+let pulseStarted   = false;
+let ambientStarted = false;
+let kaikuMaster    = null;
+let hiljaisuusMaster = null;
+let vaylaMuted       = false;
+let sykeMuted        = false;
+let toneRegister     = 'green';  // 'green' (default) or 'amber'
+let gameMode         = 'lasten'; // 'lasten' (append) or 'asema' (random insert)
+let compositionT0    = null;     // set when ambient starts; ring scrobble reads this
+
+// ─── DISCORDIAN CALENDAR ───────────────────────────────────────────────────
+// 11-position arc: 0-2 kevät, 3 kesä, 4-10 talvi (3-1-7)
+// Entry position = today's Discordian day-of-year mod 11.
+// The 13 minutes runs forward from there. Time is the master clock.
+
+const NUM_SEASONS = 11;
+
+function discordianDoy() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const doy = Math.floor(diff / oneDay);
+  // Discordian year starts on the Gregorian new year for our purposes.
+  // St. Tib's Day (leap day) is absorbed without disrupting the count.
+  return doy;
+}
+
+const SEASON_START = discordianDoy() % NUM_SEASONS;
+
+function currentSeasonIndex() {
+  if (!compositionT0 || !audioCtx) return SEASON_START;
+  const elapsed  = audioCtx.currentTime - compositionT0;
+  const total    = 13 * 60;
+  const fraction = Math.min(elapsed / total, 1);
+  const remaining = NUM_SEASONS - SEASON_START;
+  return Math.min(SEASON_START + Math.floor(fraction * remaining), NUM_SEASONS - 1);
+}
+
+function toggleMode() {
+  gameMode = gameMode === 'lasten' ? 'asema' : 'lasten';
+  const btn = document.getElementById('btn-mode');
+  btn.textContent = gameMode === 'lasten' ? 'lasten leikkiä' : 'asemavalmiina';
+  btn.title       = gameMode === 'lasten' ? "child's play — new station always last" : 'station ready — new station anywhere';
+  btn.classList.toggle('muted', gameMode === 'asema');
+}
+
+function toggleRegister() {
+  toneRegister = toneRegister === 'green' ? 'amber' : 'green';
+  const btn = document.getElementById('btn-reg');
+  btn.classList.toggle('green', toneRegister === 'green');
+}
+
+function toggleVayla() {
+  vaylaMuted = !vaylaMuted;
+  document.getElementById('btn-vayla').classList.toggle('muted', vaylaMuted);
+  // väylä mutes hex tones only — kaikuMaster (ambient) runs independently
+}
+
+function toggleSyke() {
+  sykeMuted = !sykeMuted;
+  document.getElementById('btn-syke').classList.toggle('muted', sykeMuted);
+  document.querySelector('.wordmark').style.animation = sykeMuted ? 'none' : '';
+  if (hiljaisuusMaster) hiljaisuusMaster.gain.setTargetAtTime(sykeMuted ? 0 : 0.007, audioCtx.currentTime, 0.3);
+}
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!pulseStarted)   { pulseStarted   = true; startHiljaisuusPulse(); }
+  if (!ambientStarted) { ambientStarted = true; startKaikuAmbient();    }
+  return audioCtx;
+}
+
+function startKaikuAmbient() {
+  // 13-minute hurdy composition. F# Phrygian.
+  // 3 spring — 1 summer — 7 purple. Repeat.
+  // Inspired by Jumalhämärä — the long form is the form.
+  // Lookahead scheduler (Wilson 2013): schedules 30s ahead, wakes every 4s.
+  // Mobile holds ~5–10 live nodes at any moment instead of the full graph.
+
+  const ctx    = audioCtx;
+  const t0     = ctx.currentTime + 3.0;
+  compositionT0 = t0;
+  const master = ctx.createGain();
+  master.gain.value = 0.055;
+  master.connect(ctx.destination);
+  kaikuMaster = master;
+
+  // F# Phrygian — low hurdy register (Hz)
+  const S = [92.5, 98.0, 110.0, 123.5, 138.6, 146.8, 164.8, 185.0, 196.0, 220.0, 246.9];
+  //          F#2   G2    A2     B2     C#3    D3     E3     F#3    G3     A3     B3
+  //          0     1     2      3      4      5      6      7      8      9      10
+
+  const CYCLES = [
+    { sp:[5,6,7], su:9,  pu:[7,6,5,4,3,1,0], spD:[9,7,11],  suD:20, puD:[8,9,9, 10,11,13,15] },
+    { sp:[3,5,7], su:10, pu:[8,7,5,4,3,2,1], spD:[8,8,12],  suD:22, puD:[8,9,10,10,11,12,14] },
+    { sp:[4,6,8], su:9,  pu:[7,6,4,3,2,1,0], spD:[10,7,10], suD:19, puD:[8,9,9, 11,11,13,14] },
+    { sp:[4,5,7], su:8,  pu:[6,5,4,3,2,1,0], spD:[9,8,11],  suD:18, puD:[9,9,10,10,12,13,16] },
+    { sp:[3,4,6], su:7,  pu:[7,5,4,3,2,1,1], spD:[10,8,10], suD:20, puD:[8,10,10,11,12,13,16] },
+    { sp:[2,4,6], su:7,  pu:[6,5,3,2,1,0,0], spD:[9,8,12],  suD:18, puD:[9,10,11,11,13,14,17] },
+    { sp:[5,7,6], su:8,  pu:[7,6,5,4,3,1,0], spD:[8,7,11],  suD:19, puD:[8,9,9, 10,11,12,15] },
+  ];
+
+  const SP_CUT = [340, 395, 445];
+  const SU_CUT = 540;
+  const PU_CUT = [425, 370, 315, 268, 222, 182, 152];
+
+  function vary(base) { return base * (0.78 + Math.random() * 0.44); }
+
+  // Pre-compute event timeline at init — organic timing baked in, no nodes yet.
+  const events = [];
+  let t = t0;
+  const endTime = t0 + 13 * 60;
+  let c = 0;
+  while (t < endTime - 30) {
+    const cyc = CYCLES[c % CYCLES.length];
+    for (let i = 0; i < 3 && t < endTime - 30; i++) {
+      const dur = vary(cyc.spD[i]);
+      events.push({ t, freq: S[cyc.sp[i]], dur, cutoff: SP_CUT[i] });
+      t += dur * 0.85;
+    }
+    if (t < endTime - 30) {
+      const dur = vary(cyc.suD);
+      events.push({ t, freq: S[cyc.su], dur, cutoff: SU_CUT });
+      t += dur * 0.85;
+    }
+    for (let i = 0; i < 7 && t < endTime - 30; i++) {
+      const dur = vary(cyc.puD[i]);
+      events.push({ t, freq: S[cyc.pu[i]], dur, cutoff: PU_CUT[i] });
+      t += dur * 0.85;
+    }
+    c++;
+  }
+
+  master.gain.setValueAtTime(0.055, endTime - 30);
+  master.gain.linearRampToValueAtTime(0, endTime);
+
+  const LOOKAHEAD = 30.0;  // seconds to schedule ahead
+  const TICK      = 4000;  // ms between scheduler wakes
+  let ei = 0;
+
+  function scheduleNote(ev) {
+    const { t: st, freq, dur, cutoff } = ev;
+    const fade = Math.min(2.5, dur * 0.18);
+    [freq, freq * 1.008].forEach(f => {
+      const osc  = ctx.createOscillator();
+      osc.type   = 'sawtooth';
+      osc.frequency.value = f;
+      const filt = ctx.createBiquadFilter();
+      filt.type  = 'lowpass';
+      filt.frequency.value = cutoff;
+      filt.Q.value = 2.0;
+      const env  = ctx.createGain();
+      env.gain.setValueAtTime(0,   st);
+      env.gain.linearRampToValueAtTime(0.5, st + fade);
+      env.gain.setValueAtTime(0.5, st + dur - fade);
+      env.gain.linearRampToValueAtTime(0,   st + dur);
+      osc.connect(filt); filt.connect(env); env.connect(master);
+      osc.start(st);
+      osc.stop(st + dur + 0.1);
+      osc.onended = () => { osc.disconnect(); filt.disconnect(); env.disconnect(); };
+    });
+  }
+
+  function tick() {
+    if (!audioCtx) return;
+    const until = audioCtx.currentTime + LOOKAHEAD;
+    while (ei < events.length && events[ei].t < until) {
+      scheduleNote(events[ei++]);
+    }
+    if (ei < events.length) setTimeout(tick, TICK);
+  }
+
+  setTimeout(tick, 0);
+}
+
+function startHiljaisuusPulse() {
+  // First kaiku synthesis in the real world.
+  // Hurdy register — low string, G2, sawtooth body through lowpass.
+  // 1.008x detuning: the beat IS the wheel. Do not tune it out.
+  // 0.15Hz pulse. Quieter than thought. Present.
+  const ctx    = audioCtx;
+  const t      = ctx.currentTime;
+  const master = ctx.createGain();
+  master.gain.value = 0.007;
+  master.connect(ctx.destination);
+  hiljaisuusMaster = master;
+
+  const base = 98.0; // G2 — bourdon string
+
+  [base, base * 1.008].forEach(freq => {
+    const osc           = ctx.createOscillator();
+    osc.type            = 'sawtooth';
+    osc.frequency.value = freq;
+
+    const filt          = ctx.createBiquadFilter();
+    filt.type           = 'lowpass';
+    filt.frequency.value = 380;
+    filt.Q.value        = 1.8;
+
+    const envGain       = ctx.createGain();
+    envGain.gain.value  = 0.5;
+
+    const lfo           = ctx.createOscillator();
+    lfo.type            = 'sine';
+    lfo.frequency.value = 0.15;
+
+    const lfoScale      = ctx.createGain();
+    lfoScale.gain.value = 0.5;
+
+    lfo.connect(lfoScale);
+    lfoScale.connect(envGain.gain);
+    osc.connect(filt);
+    filt.connect(envGain);
+    envGain.connect(master);
+
+    osc.start(t);
+    lfo.start(t);
+  });
+}
+
+// Season tokens — 11 positions, 0-indexed. 0-2 kevät, 3 kesä (null), 4-10 talvi.
+// Time-driven: position is read from elapsed composition time, not sequence length.
+
+const SEASON_TOKENS_AMBER = [
+  { f1: 2820, f2: 2833, gain: 0.45, decay: 0.55 },  // 0 — kevät-1  first warmth
+  { f1: 2805, f2: 2819, gain: 0.50, decay: 1.10 },  // 1 — kevät-2  three days
+  { f1: 2790, f2: 2805, gain: 0.55, decay: 2.20 },  // 2 — kevät-3  last day before summer
+  null,                                               // 3 — kesä: drawn from KESA_TONES
+  { f1: 2200, f2: 2218, gain: 0.45, decay: 4.00 },  // 4 — talvi-1
+  { f1: 1800, f2: 1814, gain: 0.38, decay: 4.50 },  // 5 — talvi-2
+  { f1: 1400, f2: 1411, gain: 0.30, decay: 5.00 },  // 6 — talvi-3
+  { f1: 1100, f2: 1109, gain: 0.22, decay: 5.50 },  // 7 — talvi-4
+  { f1:  800, f2:  806, gain: 0.15, decay: 6.00 },  // 8 — talvi-5
+  { f1:  600, f2:  605, gain: 0.09, decay: 7.00 },  // 9 — talvi-6
+  { f1:  450, f2:  454, gain: 0.04, decay: 8.00 },  // 10 — talvi-7 / hiljaisuus
+];
+
+const SEASON_TOKENS_GREEN = [
+  { f1: 1410, f2: 1417, gain: 0.45, decay: 0.55 },  // 0 — kevät-1
+  { f1: 1403, f2: 1410, gain: 0.50, decay: 1.10 },  // 1 — kevät-2
+  { f1: 1395, f2: 1403, gain: 0.55, decay: 2.20 },  // 2 — kevät-3
+  null,                                               // 3 — kesä
+  { f1: 1100, f2: 1109, gain: 0.45, decay: 4.00 },  // 4 — talvi-1
+  { f1:  900, f2:  907, gain: 0.38, decay: 4.50 },  // 5 — talvi-2
+  { f1:  700, f2:  706, gain: 0.30, decay: 5.00 },  // 6 — talvi-3
+  { f1:  550, f2:  556, gain: 0.22, decay: 5.50 },  // 7 — talvi-4
+  { f1:  400, f2:  403, gain: 0.15, decay: 6.00 },  // 8 — talvi-5
+  { f1:  300, f2:  302, gain: 0.09, decay: 7.00 },  // 9 — talvi-6
+  { f1:  225, f2:  227, gain: 0.04, decay: 8.00 },  // 10 — talvi-7 / hiljaisuus
+];
+
+// kesä — F# Phrygian pentatonic: F#, G, B, C#, E
+// Two octaves in the triangle register. The b2 (G) is the Phrygian blade.
+// Random draw each time. Paho can write the sequence when he's ready.
+const KESA_TONES_AMBER = [740, 784, 988, 1109, 1319, 1480, 1568, 1976, 2217, 2637];
+//                        F#5  G5   B5   C#6   E6    F#6   G6    B6    C#7   E7
+const KESA_TONES_GREEN  = [370, 392, 494,  554,  660,  740,  784,  988, 1109, 1319];
+//                        F#4  G4   B4   C#5   E5    F#5   G5    B5    C#6   E6
+
+// Season index driven by game progress (sequence length), not elapsed time.
+// seq 1 → 0 (kevät-1), seq 4 → 3 (kesä), seq 5 → 4 (talvi-1, dark start), …
+function seasonIndexForSound() {
+  return Math.min(Math.max(STATE.sequence.length - 1, 0), NUM_SEASONS - 1);
+}
+
+function seasonalSound() {
+  if (vaylaMuted) return;
+  const ctx = getAudioCtx();
+  const t   = ctx.currentTime;
+  const pos = seasonIndexForSound();
+
+  let f1, f2, gain, decay;
+
+  const TOKENS = toneRegister === 'amber' ? SEASON_TOKENS_AMBER : SEASON_TOKENS_GREEN;
+  const KESA   = toneRegister === 'amber' ? KESA_TONES_AMBER    : KESA_TONES_GREEN;
+
+  if (pos === 3) {
+    // kesä — random pentatonic draw, shimmer beat
+    f1    = KESA[Math.floor(Math.random() * KESA.length)];
+    f2    = f1 + 15;
+    gain  = 0.55;
+    decay = 6.00;
+  } else {
+    const tok = TOKENS[pos];
+    if (!tok) return;
+    f1 = tok.f1; f2 = tok.f2; gain = tok.gain; decay = tok.decay;
+  }
+
+  [f1, f2].forEach(freq => {
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    env.gain.setValueAtTime(gain / 2, t);
+    env.gain.exponentialRampToValueAtTime(0.001, t + decay);
+    osc.connect(env);
+    env.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + decay + 0.05);
+  });
+}
+
+function vaaraSound() {
+  if (vaylaMuted) return;
+  // The anvil. From above. Once. Unambiguous.
+  const ctx  = getAudioCtx();
+  const t    = ctx.currentTime;
+  const dur  = 0.6;
+  const len  = Math.floor(ctx.sampleRate * dur);
+  const buf  = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  }
+  const src  = ctx.createBufferSource();
+  src.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type  = 'bandpass';
+  filt.frequency.value = toneRegister === 'amber' ? 3500 : 1750;
+  filt.Q.value = 0.6;
+  const gain = ctx.createGain();
+  gain.gain.value = 0.7;
+  src.connect(filt);
+  filt.connect(gain);
+  gain.connect(ctx.destination);
+  src.start(t);
+}
+
+// ─── GAME LOGIC ────────────────────────────────────────────────────────────
+
+function stepDelay() {
+  // 1300ms at round 0, decreasing 35ms per round, floor 650ms
+  return Math.max(650, 1300 - STATE.round * 35);
+}
+
+function newRound() {
+  STATE.phase    = 'watching';
+  STATE.progress = 0;
+  canvas.classList.add('watching');
+
+  // Extend sequence by one
+  const pick = STATIONS[Math.floor(Math.random() * STATIONS.length)];
+  if (gameMode === 'asema') {
+    const pos = Math.floor(Math.random() * (STATE.sequence.length + 1));
+    STATE.sequence.splice(pos, 0, pick.hex);
+  } else {
+    STATE.sequence.push(pick.hex);
+  }
+
+  setStatus('');
+  devReadout();
+  playSequence();
+}
+
+function playSequence() {
+  const delay = stepDelay();
+  let step = 0;
+
+  function showNext() {
+    if (step >= STATE.sequence.length) {
+      // All steps shown — hand to player
+      setTimeout(() => {
+        STATE.phase = 'input';
+        canvas.classList.remove('watching');
+        setStatus('');
+      }, Math.round(delay * 0.5));
+      return;
+    }
+    hlSet(STATE.sequence[step]);
+    step++;
+    setTimeout(showNext, delay);
+  }
+
+  // Initial pause before first step
+  setTimeout(showNext, Math.round(delay * 0.7));
+}
+
+function handleInput(hex) {
+  if (STATE.phase !== 'input') return;
+
+  const target = STATE.sequence[STATE.progress];
+
+  // BFS trail
+  const path = bfsPath(STATE.playerHex, hex, allHexes);
+  STATE.trail.push(...path.slice(1));
+  if (STATE.trail.length > 40) STATE.trail.splice(0, STATE.trail.length - 40);
+  STATE.playerHex = hex;
+
+  const correct = hexKey(hex) === hexKey(target);
+
+  if (correct) {
+    hlSet(hex);
+    STATE.progress++;
+
+    if (STATE.progress === STATE.sequence.length) {
+      // Round complete
+      STATE.phase = 'idle';
+      STATE.round++;
+      canvas.classList.remove('watching');
+
+      const newStation = stationByKey[hexKey(STATE.sequence[STATE.sequence.length - 1])];
+      if (newStation) pushGlyph(newStation);
+      updateSeqCount();
+
+      setStatus('');
+      devReadout();
+      setTimeout(newRound, 1000);
+    }
+  } else {
+    // Disruption — reset sequence, wipe tray, log quietly in Finnish
+    STATE.phase = 'idle';
+    canvas.classList.add('watching');
+    STATE.disruptions++;
+    maybeUpdateBest();
+    vaaraSound();
+
+    const word = FI[Math.min(STATE.disruptions, FI.length - 1)];
+    document.getElementById('log-line').textContent = word + '.';
+
+    setTimeout(() => {
+      STATE.sequence  = [];
+      STATE.trail     = [];
+      STATE.glyphs    = [];
+      STATE.playerHex = STATIONS[Math.floor(Math.random() * STATIONS.length)].hex;
+
+      const tray = document.getElementById('glyph-tray');
+      tray.innerHTML = '<span class="tray-empty" id="tray-empty">—</span>';
+
+      setStatus('');
+      devReadout();
+      updateSeqCount();
+      setTimeout(newRound, 500);
+    }, 900);
+  }
+}
+
+
+// --- GLYPH TRAY ---
+
+function pushGlyph(station) {
+  STATE.glyphs.push({
+    key: station.key,
+    sem: station.sem,
+    n:   STATE.glyphs.length + 1,
+  });
+  renderTray();
+}
+
+function renderTray() {
+  const tray  = document.getElementById('glyph-tray');
+  tray.innerHTML = '';
+
+  if (STATE.glyphs.length === 0) {
+    tray.innerHTML = '<span class="tray-empty" id="tray-empty">—</span>';
+    return;
+  }
+
+  STATE.glyphs.forEach((g, i) => {
+    const fresh  = i === STATE.glyphs.length - 1;
+    const tile   = document.createElement('div');
+    tile.className = 'glyph-tile' + (fresh ? ' fresh' : '');
+
+    const n = document.createElement('div');
+    n.className   = 'glyph-n';
+    n.textContent = g.n;
+
+    const sprite = document.createElement('canvas');
+    sprite.className = 'glyph-sprite';
+    sprite.width  = 28;
+    sprite.height = 28;
+    drawSemaphore(sprite, g.sem[0], g.sem[1], '#f0a030');
+
+    const key = document.createElement('div');
+    key.className   = 'glyph-key';
+    key.textContent = g.key;
+
+    tile.appendChild(n);
+    tile.appendChild(sprite);
+    tile.appendChild(key);
+    tray.appendChild(tile);
+
+    if (fresh) {
+      setTimeout(() => tile.classList.remove('fresh'), 2500);
+    }
+  });
+}
+
+// --- UI HELPERS ---
+
+function setStatus(text, cls) {
+  const el = document.getElementById('status');
+  el.textContent = text;
+  el.className   = 'status-line' + (cls ? ` ${cls}` : '');
+}
+
+const SESSION_BEST_KEY = m => `kaamos-kuule-best-${m}`;
+
+function sessionBest() {
+  return parseInt(sessionStorage.getItem(SESSION_BEST_KEY(gameMode)) || '0', 10);
+}
+
+function updateSeqCount() {
+  const n    = STATE.glyphs.length;
+  const best = sessionBest();
+  document.getElementById('seq-n').textContent  = n;
+  document.getElementById('seq-fi').textContent = FI[Math.min(n, FI.length - 1)];
+  if (best > 0) {
+    document.getElementById('seq-best').textContent = `paras ${FI[Math.min(best, FI.length - 1)]}`;
+  }
+}
+
+function maybeUpdateBest() {
+  const n    = STATE.glyphs.length;
+  const best = sessionBest();
+  if (n > best) sessionStorage.setItem(SESSION_BEST_KEY(gameMode), n);
+}
+
+function devReadout() {
+  if (!DEV) return;
+  const el = document.getElementById('dev-readout');
+  el.textContent = STATE.sequence.length ? `seq ${STATE.sequence.length}` : '';
+}
+
+// --- INPUT ---
+
+canvas.addEventListener('click', e => {
+  if (STATE.phase !== 'input') return;
+  const rect   = canvas.getBoundingClientRect();
+  const scaleX = canvas.width  / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top)  * scaleY;
+  const hex = pixelToHex(x, y, HEX_SIZE, ORIGIN);
+  if (!stationByKey[hexKey(hex)]) return;
+  handleInput(hex);
+});
+
+// ─── DISCORDIAN DATE ───────────────────────────────────────────────────────
+// Discordian calendar with KaamOS idiomatic translation.
+// Five seasons. Five days. The year measured in disruptions.
+//
+// Season translations:
+//   Chaos          → repäisy       (tearing — the brane tears)
+//   Discord        → riitasointu   (dissonance — the musical register)
+//   Confusion      → hämyys        (dimness — the half-dark, kaamos-adjacent)
+//   Bureaucracy    → rekisteri     (the registry — the archive, the controllers)
+//   The Aftermath  → jälkimaine    (the afterglow — from the author's notes)
+//
+// Day translations:
+//   Sweetmorn      → heleähetki    (bright-moment — first warmth, spring register)
+//   Boomtime       → pamaus        (boom — compressed, like the vaara sound)
+//   Pungenday      → pistopäivä    (sting-day — the phrygian blade)
+//   Prickle-Prickle→ piikkipiikki  (cognate Finnification — keeps the doubled structure)
+//   Setting Orange → meripihka-lasku (amber-descent — the signal going dark)
+//
+// YOLD → h.v. (häiriön vuosi — year of disruption — echoes STATE.disruptions)
+// St. Tib's Day → tibsenhetki · asematon (the brane fold outside all seasons)
+
+function discordianDate(date) {
+  const d    = date || new Date();
+  const yr   = d.getFullYear();
+  const yold = yr + 1166;
+
+  const y0   = new Date(yr, 0, 1);
+  const doy  = Math.floor((d - y0) / 86400000) + 1;
+  const isLp = (yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0;
+
+  if (isLp && doy === 60) {
+    return {
+      en: `st. tib's day, ${yold} yold`,
+      km: `tibsenhetki · asematon · ${yold} h.v.`,
+    };
+  }
+
+  const dd = (isLp && doy > 60) ? doy - 1 : doy;
+
+  const SEA_EN = ['chaos',      'discord',      'confusion', 'bureaucracy', 'the aftermath'];
+  const SEA_KM = ['repäisy',    'riitasointu',  'hämyys',    'rekisteri',   'jälkimaine'  ];
+  const DAY_EN = ['sweetmorn',  'boomtime',     'pungenday', 'prickle-prickle', 'setting orange' ];
+  const DAY_KM = ['heleähetki', 'pamaus',       'pistopäivä','piikkipiikki',    'meripihka-lasku'];
+
+  const si = Math.floor((dd - 1) / 73);
+  const ds = ((dd - 1) % 73) + 1;
+  const dw = (dd - 1) % 5;
+
+  return {
+    en: `${DAY_EN[dw]}, ${SEA_EN[si]} ${ds}, ${yold} yold`,
+    km: `${DAY_KM[dw]} · ${SEA_KM[si]} ${ds} · ${yold} h.v.`,
+  };
+}
+
+// --- INIT ---
+
+render();
+setTimeout(newRound, 1500);
+
+(function () {
+  const disc = discordianDate();
+  document.getElementById('disc-en').textContent = disc.en;
+  document.getElementById('disc-km').textContent = disc.km;
+})();
+
+</script>
+</body>
+</html>

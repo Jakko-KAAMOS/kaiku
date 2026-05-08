@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>täyden spektrin väri — kaiku</title>
+<link rel="stylesheet" href="/palette.css">
+<link rel="stylesheet" href="/shapes.css">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.65;
+    padding: 0 0 8rem;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.75rem 0 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .kicker {
+    font-family: 'Courier New', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 0.35rem;
+  }
+
+  .kicker a { color: inherit; text-decoration: none; }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: var(--meripihka);
+    letter-spacing: 0.02em;
+  }
+
+  .register { margin-bottom: 1.25rem; }
+
+  .register-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 0.4rem;
+    opacity: 0.7;
+  }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 3px; }
+
+  a.swatch {
+    display: block;
+    width: 84px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.04);
+    text-decoration: none;
+    transition: border-color 0.12s;
+    flex-shrink: 0;
+  }
+
+  a.swatch:hover { border-color: var(--meripihka-dim); }
+
+  .swatch-bar { height: 36px; width: 100%; }
+
+  .swatch-info {
+    background: var(--kuilu-syvä);
+    padding: 3px 4px 4px;
+  }
+
+  .swatch-name {
+    font-family: 'Courier New', monospace;
+    font-size: 0.50rem;
+    color: var(--meripihka-dim);
+    display: block;
+    line-height: 1.3;
+    word-break: break-all;
+  }
+
+  .swatch-hex {
+    font-family: 'Courier New', monospace;
+    font-size: 0.50rem;
+    color: var(--hopea);
+    display: block;
+  }
+
+  hr.amber {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--meripihka-dim), transparent);
+    margin: 2.25rem 0;
+  }
+
+  .lexicon-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 1.75rem;
+    opacity: 0.7;
+  }
+
+  .family-rule {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin: 2rem 0 1.25rem;
+    opacity: 0.5;
+  }
+
+  .entry {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    scroll-margin-top: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .entry-content { flex: 1; }
+
+  .entry-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .entry-term {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--meripihka);
+    letter-spacing: 0.04em;
+  }
+
+  .entry-hex {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--hopea);
+  }
+
+  .entry-tag {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    opacity: 0.7;
+  }
+
+  .entry-body {
+    color: var(--text);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-top: 0.2rem;
+  }
+
+  .entry-body .fi { font-style: italic; color: var(--meripihka-dim); }
+  .entry-body a { color: var(--järvi); text-decoration: none; }
+  .entry-body a:hover { color: var(--meri); }
+
+  .site-footer {
+    border-top: 1px solid var(--varjo);
+    margin-top: 5rem;
+    padding-top: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.1em;
+    color: var(--meripihka-dim);
+    opacity: 0.6;
+  }
+
+  @media (max-width: 500px) { a.swatch { width: 72px; } }
+
+</style>
+<link rel="icon" id="favicon" type="image/svg+xml" href="">
+<script src="/favicon.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <div class="kicker"><a href="/">rebraining.org</a> / <a href="/kaiku/väri">kaiku</a></div>
+    <h1>täyden spektrin väri</h1>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════════
+       SWATCH GRID
+       ══════════════════════════════════════════════════ -->
+
+  <!-- ── tyhjyys ── -->
+  <div class="register">
+    <div class="register-label">tyhjyys</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#tyhjyys"><div class="swatch-bar" style="background:#0c0c0c"></div><div class="swatch-info"><span class="swatch-name">--tyhjyys</span><span class="swatch-hex">#0c0c0c</span></div></a>
+      <a class="swatch" href="#tyhjyys-lämmin"><div class="swatch-bar" style="background:#0e0c0a"></div><div class="swatch-info"><span class="swatch-name">--tyhjyys-lämmin</span><span class="swatch-hex">#0e0c0a</span></div></a>
+      <a class="swatch" href="#kuilu"><div class="swatch-bar" style="background:#141210"></div><div class="swatch-info"><span class="swatch-name">--kuilu</span><span class="swatch-hex">#141210</span></div></a>
+      <a class="swatch" href="#kuilu-syvä"><div class="swatch-bar" style="background:#181614"></div><div class="swatch-info"><span class="swatch-name">--kuilu-syvä</span><span class="swatch-hex">#181614</span></div></a>
+      <a class="swatch" href="#kolkko"><div class="swatch-bar" style="background:#1c1a16"></div><div class="swatch-info"><span class="swatch-name">--kolkko</span><span class="swatch-hex">#1c1a16</span></div></a>
+      <a class="swatch" href="#varjo"><div class="swatch-bar" style="background:#201e18"></div><div class="swatch-info"><span class="swatch-name">--varjo</span><span class="swatch-hex">#201e18</span></div></a>
+      <a class="swatch" href="#varjo-lämmin"><div class="swatch-bar" style="background:#241e16"></div><div class="swatch-info"><span class="swatch-name">--varjo-lämmin</span><span class="swatch-hex">#241e16</span></div></a>
+      <a class="swatch" href="#hämärä-syvä"><div class="swatch-bar" style="background:#2a2018"></div><div class="swatch-info"><span class="swatch-name">--hämärä-syvä</span><span class="swatch-hex">#2a2018</span></div></a>
+      <a class="swatch" href="#hämärä"><div class="swatch-bar" style="background:#2e2418"></div><div class="swatch-info"><span class="swatch-name">--hämärä</span><span class="swatch-hex">#2e2418</span></div></a>
+      <a class="swatch" href="#hämärä-kirkas"><div class="swatch-bar" style="background:#342a1c"></div><div class="swatch-info"><span class="swatch-name">--hämärä-kirkas</span><span class="swatch-hex">#342a1c</span></div></a>
+      <a class="swatch" href="#pimeä"><div class="swatch-bar" style="background:#3a2e20"></div><div class="swatch-info"><span class="swatch-name">--pimeä</span><span class="swatch-hex">#3a2e20</span></div></a>
+      <a class="swatch" href="#pimeä-kirkas"><div class="swatch-bar" style="background:#403428"></div><div class="swatch-info"><span class="swatch-name">--pimeä-kirkas</span><span class="swatch-hex">#403428</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── meripihka ── -->
+  <div class="register">
+    <div class="register-label">meripihka</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#meripihka-hiili"><div class="swatch-bar" style="background:#3a2010"></div><div class="swatch-info"><span class="swatch-name">--meripihka-hiili</span><span class="swatch-hex">#3a2010</span></div></a>
+      <a class="swatch" href="#meripihka-syvä"><div class="swatch-bar" style="background:#4a2e10"></div><div class="swatch-info"><span class="swatch-name">--meripihka-syvä</span><span class="swatch-hex">#4a2e10</span></div></a>
+      <a class="swatch" href="#meripihka-tumma"><div class="swatch-bar" style="background:#5a3810"></div><div class="swatch-info"><span class="swatch-name">--meripihka-tumma</span><span class="swatch-hex">#5a3810</span></div></a>
+      <a class="swatch" href="#meripihka-matta"><div class="swatch-bar" style="background:#6a4810"></div><div class="swatch-info"><span class="swatch-name">--meripihka-matta</span><span class="swatch-hex">#6a4810</span></div></a>
+      <a class="swatch" href="#meripihka-low"><div class="swatch-bar" style="background:#7a5218"></div><div class="swatch-info"><span class="swatch-name">--meripihka-low</span><span class="swatch-hex">#7a5218</span></div></a>
+      <a class="swatch" href="#meripihka-varjo"><div class="swatch-bar" style="background:#8a5e18"></div><div class="swatch-info"><span class="swatch-name">--meripihka-varjo</span><span class="swatch-hex">#8a5e18</span></div></a>
+      <a class="swatch" href="#meripihka-dim"><div class="swatch-bar" style="background:#9a6820"></div><div class="swatch-info"><span class="swatch-name">--meripihka-dim</span><span class="swatch-hex">#9a6820</span></div></a>
+      <a class="swatch" href="#meripihka-samea"><div class="swatch-bar" style="background:#a87828"></div><div class="swatch-info"><span class="swatch-name">--meripihka-samea</span><span class="swatch-hex">#a87828</span></div></a>
+      <a class="swatch" href="#meripihka-keski"><div class="swatch-bar" style="background:#b88830"></div><div class="swatch-info"><span class="swatch-name">--meripihka-keski</span><span class="swatch-hex">#b88830</span></div></a>
+      <a class="swatch" href="#meripihka-vaalea"><div class="swatch-bar" style="background:#c89030"></div><div class="swatch-info"><span class="swatch-name">--meripihka-vaalea</span><span class="swatch-hex">#c89030</span></div></a>
+      <a class="swatch" href="#meripihka"><div class="swatch-bar" style="background:#f0a030"></div><div class="swatch-info"><span class="swatch-name">--meripihka</span><span class="swatch-hex">#f0a030</span></div></a>
+      <a class="swatch" href="#meripihka-kirkas"><div class="swatch-bar" style="background:#f0b040"></div><div class="swatch-info"><span class="swatch-name">--meripihka-kirkas</span><span class="swatch-hex">#f0b040</span></div></a>
+      <a class="swatch" href="#meripihka-lämmin"><div class="swatch-bar" style="background:#f4b840"></div><div class="swatch-info"><span class="swatch-name">--meripihka-lämmin</span><span class="swatch-hex">#f4b840</span></div></a>
+      <a class="swatch" href="#hehku"><div class="swatch-bar" style="background:#f8c060"></div><div class="swatch-info"><span class="swatch-name">--hehku</span><span class="swatch-hex">#f8c060</span></div></a>
+      <a class="swatch" href="#hehku-kirkas"><div class="swatch-bar" style="background:#fac870"></div><div class="swatch-info"><span class="swatch-name">--hehku-kirkas</span><span class="swatch-hex">#fac870</span></div></a>
+      <a class="swatch" href="#kipinä-samea"><div class="swatch-bar" style="background:#fcd078"></div><div class="swatch-info"><span class="swatch-name">--kipinä-samea</span><span class="swatch-hex">#fcd078</span></div></a>
+      <a class="swatch" href="#kipinä"><div class="swatch-bar" style="background:#ffdd80"></div><div class="swatch-info"><span class="swatch-name">--kipinä</span><span class="swatch-hex">#ffdd80</span></div></a>
+      <a class="swatch" href="#kipinä-kirkas"><div class="swatch-bar" style="background:#ffe898"></div><div class="swatch-info"><span class="swatch-name">--kipinä-kirkas</span><span class="swatch-hex">#ffe898</span></div></a>
+      <a class="swatch" href="#liekki"><div class="swatch-bar" style="background:#fff0b0"></div><div class="swatch-info"><span class="swatch-name">--liekki</span><span class="swatch-hex">#fff0b0</span></div></a>
+      <a class="swatch" href="#liekki-kirkas"><div class="swatch-bar" style="background:#fff8d0"></div><div class="swatch-info"><span class="swatch-name">--liekki-kirkas</span><span class="swatch-hex">#fff8d0</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── lumi-tuhka ── -->
+  <div class="register">
+    <div class="register-label">lumi-tuhka</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#tuhka-syvä"><div class="swatch-bar" style="background:#3a3028"></div><div class="swatch-info"><span class="swatch-name">--tuhka-syvä</span><span class="swatch-hex">#3a3028</span></div></a>
+      <a class="swatch" href="#tuhka"><div class="swatch-bar" style="background:#4a4030"></div><div class="swatch-info"><span class="swatch-name">--tuhka</span><span class="swatch-hex">#4a4030</span></div></a>
+      <a class="swatch" href="#tuhka-kirkas"><div class="swatch-bar" style="background:#5a5038"></div><div class="swatch-info"><span class="swatch-name">--tuhka-kirkas</span><span class="swatch-hex">#5a5038</span></div></a>
+      <a class="swatch" href="#tuhka-vaalea"><div class="swatch-bar" style="background:#6a6048"></div><div class="swatch-info"><span class="swatch-name">--tuhka-vaalea</span><span class="swatch-hex">#6a6048</span></div></a>
+      <a class="swatch" href="#hiili-lämmin"><div class="swatch-bar" style="background:#706050"></div><div class="swatch-info"><span class="swatch-name">--hiili-lämmin</span><span class="swatch-hex">#706050</span></div></a>
+      <a class="swatch" href="#hiekka-tumma"><div class="swatch-bar" style="background:#7a6858"></div><div class="swatch-info"><span class="swatch-name">--hiekka-tumma</span><span class="swatch-hex">#7a6858</span></div></a>
+      <a class="swatch" href="#hiekka"><div class="swatch-bar" style="background:#8a7a60"></div><div class="swatch-info"><span class="swatch-name">--hiekka</span><span class="swatch-hex">#8a7a60</span></div></a>
+      <a class="swatch" href="#hiekka-kirkas"><div class="swatch-bar" style="background:#9a8a70"></div><div class="swatch-info"><span class="swatch-name">--hiekka-kirkas</span><span class="swatch-hex">#9a8a70</span></div></a>
+      <a class="swatch" href="#hiekka-vaalea"><div class="swatch-bar" style="background:#aa9a80"></div><div class="swatch-info"><span class="swatch-name">--hiekka-vaalea</span><span class="swatch-hex">#aa9a80</span></div></a>
+      <a class="swatch" href="#samea"><div class="swatch-bar" style="background:#b0a080"></div><div class="swatch-info"><span class="swatch-name">--samea</span><span class="swatch-hex">#b0a080</span></div></a>
+      <a class="swatch" href="#samea-kirkas"><div class="swatch-bar" style="background:#c0b090"></div><div class="swatch-info"><span class="swatch-name">--samea-kirkas</span><span class="swatch-hex">#c0b090</span></div></a>
+      <a class="swatch" href="#norsunluu-tumma"><div class="swatch-bar" style="background:#ccc0a0"></div><div class="swatch-info"><span class="swatch-name">--norsunluu-tumma</span><span class="swatch-hex">#ccc0a0</span></div></a>
+      <a class="swatch" href="#norsunluu-keski"><div class="swatch-bar" style="background:#d0c0a0"></div><div class="swatch-info"><span class="swatch-name">--norsunluu-keski</span><span class="swatch-hex">#d0c0a0</span></div></a>
+      <a class="swatch" href="#norsunluu"><div class="swatch-bar" style="background:#dfd0b0"></div><div class="swatch-info"><span class="swatch-name">--norsunluu</span><span class="swatch-hex">#dfd0b0</span></div></a>
+      <a class="swatch" href="#norsunluu-kirkas"><div class="swatch-bar" style="background:#e8dcc0"></div><div class="swatch-info"><span class="swatch-name">--norsunluu-kirkas</span><span class="swatch-hex">#e8dcc0</span></div></a>
+      <a class="swatch" href="#kaura"><div class="swatch-bar" style="background:#f0e8c8"></div><div class="swatch-info"><span class="swatch-name">--kaura</span><span class="swatch-hex">#f0e8c8</span></div></a>
+      <a class="swatch" href="#kaura-kirkas"><div class="swatch-bar" style="background:#f4edd0"></div><div class="swatch-info"><span class="swatch-name">--kaura-kirkas</span><span class="swatch-hex">#f4edd0</span></div></a>
+      <a class="swatch" href="#pellava"><div class="swatch-bar" style="background:#f4eed8"></div><div class="swatch-info"><span class="swatch-name">--pellava</span><span class="swatch-hex">#f4eed8</span></div></a>
+      <a class="swatch" href="#lumi-lämmin"><div class="swatch-bar" style="background:#f8f4ec"></div><div class="swatch-info"><span class="swatch-name">--lumi-lämmin</span><span class="swatch-hex">#f8f4ec</span></div></a>
+      <a class="swatch" href="#lumi"><div class="swatch-bar" style="background:#fcfaf4"></div><div class="swatch-info"><span class="swatch-name">--lumi</span><span class="swatch-hex">#fcfaf4</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── harmaa ── -->
+  <div class="register">
+    <div class="register-label">harmaa</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#harmaa-musta"><div class="swatch-bar" style="background:#181818"></div><div class="swatch-info"><span class="swatch-name">--harmaa-musta</span><span class="swatch-hex">#181818</span></div></a>
+      <a class="swatch" href="#harmaa-yö"><div class="swatch-bar" style="background:#202020"></div><div class="swatch-info"><span class="swatch-name">--harmaa-yö</span><span class="swatch-hex">#202020</span></div></a>
+      <a class="swatch" href="#harmaa-syvä"><div class="swatch-bar" style="background:#2c2c2c"></div><div class="swatch-info"><span class="swatch-name">--harmaa-syvä</span><span class="swatch-hex">#2c2c2c</span></div></a>
+      <a class="swatch" href="#harmaa-tumma"><div class="swatch-bar" style="background:#383838"></div><div class="swatch-info"><span class="swatch-name">--harmaa-tumma</span><span class="swatch-hex">#383838</span></div></a>
+      <a class="swatch" href="#harmaa-keski-tumma"><div class="swatch-bar" style="background:#484848"></div><div class="swatch-info"><span class="swatch-name">--harmaa-keski-tumma</span><span class="swatch-hex">#484848</span></div></a>
+      <a class="swatch" href="#harmaa-keski"><div class="swatch-bar" style="background:#585858"></div><div class="swatch-info"><span class="swatch-name">--harmaa-keski</span><span class="swatch-hex">#585858</span></div></a>
+      <a class="swatch" href="#harmaa"><div class="swatch-bar" style="background:#686868"></div><div class="swatch-info"><span class="swatch-name">--harmaa</span><span class="swatch-hex">#686868</span></div></a>
+      <a class="swatch" href="#harmaa-kirkas"><div class="swatch-bar" style="background:#787878"></div><div class="swatch-info"><span class="swatch-name">--harmaa-kirkas</span><span class="swatch-hex">#787878</span></div></a>
+      <a class="swatch" href="#hopea-tumma"><div class="swatch-bar" style="background:#888888"></div><div class="swatch-info"><span class="swatch-name">--hopea-tumma</span><span class="swatch-hex">#888888</span></div></a>
+      <a class="swatch" href="#hopea"><div class="swatch-bar" style="background:#989898"></div><div class="swatch-info"><span class="swatch-name">--hopea</span><span class="swatch-hex">#989898</span></div></a>
+      <a class="swatch" href="#hopea-kirkas"><div class="swatch-bar" style="background:#a8a8a8"></div><div class="swatch-info"><span class="swatch-name">--hopea-kirkas</span><span class="swatch-hex">#a8a8a8</span></div></a>
+      <a class="swatch" href="#hopea-vaalea"><div class="swatch-bar" style="background:#b8b8b8"></div><div class="swatch-info"><span class="swatch-name">--hopea-vaalea</span><span class="swatch-hex">#b8b8b8</span></div></a>
+      <a class="swatch" href="#harmaa-vaalea"><div class="swatch-bar" style="background:#c8c8c8"></div><div class="swatch-info"><span class="swatch-name">--harmaa-vaalea</span><span class="swatch-hex">#c8c8c8</span></div></a>
+      <a class="swatch" href="#harmaa-haale"><div class="swatch-bar" style="background:#d8d8d8"></div><div class="swatch-info"><span class="swatch-name">--harmaa-haale</span><span class="swatch-hex">#d8d8d8</span></div></a>
+      <a class="swatch" href="#harmaa-valkoinen"><div class="swatch-bar" style="background:#e8e8e8"></div><div class="swatch-info"><span class="swatch-name">--harmaa-valkoinen</span><span class="swatch-hex">#e8e8e8</span></div></a>
+      <a class="swatch" href="#lumi-viileä"><div class="swatch-bar" style="background:#f4f4f4"></div><div class="swatch-info"><span class="swatch-name">--lumi-viileä</span><span class="swatch-hex">#f4f4f4</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── kulta ── -->
+  <div class="register">
+    <div class="register-label">kulta</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#kulta-syvä"><div class="swatch-bar" style="background:#3a2800"></div><div class="swatch-info"><span class="swatch-name">--kulta-syvä</span><span class="swatch-hex">#3a2800</span></div></a>
+      <a class="swatch" href="#kulta-tumma"><div class="swatch-bar" style="background:#6a4800"></div><div class="swatch-info"><span class="swatch-name">--kulta-tumma</span><span class="swatch-hex">#6a4800</span></div></a>
+      <a class="swatch" href="#kulta-keski"><div class="swatch-bar" style="background:#9a6800"></div><div class="swatch-info"><span class="swatch-name">--kulta-keski</span><span class="swatch-hex">#9a6800</span></div></a>
+      <a class="swatch" href="#kulta"><div class="swatch-bar" style="background:#c8a020"></div><div class="swatch-info"><span class="swatch-name">--kulta</span><span class="swatch-hex">#c8a020</span></div></a>
+      <a class="swatch" href="#kulta-kirkas"><div class="swatch-bar" style="background:#d8b030"></div><div class="swatch-info"><span class="swatch-name">--kulta-kirkas</span><span class="swatch-hex">#d8b030</span></div></a>
+      <a class="swatch" href="#kulta-vaalea"><div class="swatch-bar" style="background:#e8c848"></div><div class="swatch-info"><span class="swatch-name">--kulta-vaalea</span><span class="swatch-hex">#e8c848</span></div></a>
+      <a class="swatch" href="#kulta-haale"><div class="swatch-bar" style="background:#f0d870"></div><div class="swatch-info"><span class="swatch-name">--kulta-haale</span><span class="swatch-hex">#f0d870</span></div></a>
+      <a class="swatch" href="#kulta-lämmin"><div class="swatch-bar" style="background:#f4e098"></div><div class="swatch-info"><span class="swatch-name">--kulta-lämmin</span><span class="swatch-hex">#f4e098</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── keltainen ── -->
+  <div class="register">
+    <div class="register-label">keltainen</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#keltainen-syvä"><div class="swatch-bar" style="background:#403000"></div><div class="swatch-info"><span class="swatch-name">--keltainen-syvä</span><span class="swatch-hex">#403000</span></div></a>
+      <a class="swatch" href="#keltainen-tumma"><div class="swatch-bar" style="background:#604800"></div><div class="swatch-info"><span class="swatch-name">--keltainen-tumma</span><span class="swatch-hex">#604800</span></div></a>
+      <a class="swatch" href="#okra-tumma"><div class="swatch-bar" style="background:#806020"></div><div class="swatch-info"><span class="swatch-name">--okra-tumma</span><span class="swatch-hex">#806020</span></div></a>
+      <a class="swatch" href="#okra"><div class="swatch-bar" style="background:#a07820"></div><div class="swatch-info"><span class="swatch-name">--okra</span><span class="swatch-hex">#a07820</span></div></a>
+      <a class="swatch" href="#keltainen-keski"><div class="swatch-bar" style="background:#c09020"></div><div class="swatch-info"><span class="swatch-name">--keltainen-keski</span><span class="swatch-hex">#c09020</span></div></a>
+      <a class="swatch" href="#keltainen"><div class="swatch-bar" style="background:#e0b020"></div><div class="swatch-info"><span class="swatch-name">--keltainen</span><span class="swatch-hex">#e0b020</span></div></a>
+      <a class="swatch" href="#aurinko"><div class="swatch-bar" style="background:#f4c820"></div><div class="swatch-info"><span class="swatch-name">--aurinko</span><span class="swatch-hex">#f4c820</span></div></a>
+      <a class="swatch" href="#keltainen-kirkas"><div class="swatch-bar" style="background:#f0c020"></div><div class="swatch-info"><span class="swatch-name">--keltainen-kirkas</span><span class="swatch-hex">#f0c020</span></div></a>
+      <a class="swatch" href="#aurinko-kirkas"><div class="swatch-bar" style="background:#f8d840"></div><div class="swatch-info"><span class="swatch-name">--aurinko-kirkas</span><span class="swatch-hex">#f8d840</span></div></a>
+      <a class="swatch" href="#keltainen-haale"><div class="swatch-bar" style="background:#f8d040"></div><div class="swatch-info"><span class="swatch-name">--keltainen-haale</span><span class="swatch-hex">#f8d040</span></div></a>
+      <a class="swatch" href="#keltainen-vaalea"><div class="swatch-bar" style="background:#f8e060"></div><div class="swatch-info"><span class="swatch-name">--keltainen-vaalea</span><span class="swatch-hex">#f8e060</span></div></a>
+      <a class="swatch" href="#keltainen-lämmin"><div class="swatch-bar" style="background:#fce880"></div><div class="swatch-info"><span class="swatch-name">--keltainen-lämmin</span><span class="swatch-hex">#fce880</span></div></a>
+      <a class="swatch" href="#olki"><div class="swatch-bar" style="background:#f8e8a0"></div><div class="swatch-info"><span class="swatch-name">--olki</span><span class="swatch-hex">#f8e8a0</span></div></a>
+      <a class="swatch" href="#olki-kirkas"><div class="swatch-bar" style="background:#fceeb8"></div><div class="swatch-info"><span class="swatch-name">--olki-kirkas</span><span class="swatch-hex">#fceeb8</span></div></a>
+      <a class="swatch" href="#olki-vaalea"><div class="swatch-bar" style="background:#fef4d0"></div><div class="swatch-info"><span class="swatch-name">--olki-vaalea</span><span class="swatch-hex">#fef4d0</span></div></a>
+      <a class="swatch" href="#keltainen-valkoinen"><div class="swatch-bar" style="background:#fefbe8"></div><div class="swatch-info"><span class="swatch-name">--keltainen-valkoinen</span><span class="swatch-hex">#fefbe8</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── oranssi ── -->
+  <div class="register">
+    <div class="register-label">oranssi</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#oranssi-syvä"><div class="swatch-bar" style="background:#3a1400"></div><div class="swatch-info"><span class="swatch-name">--oranssi-syvä</span><span class="swatch-hex">#3a1400</span></div></a>
+      <a class="swatch" href="#oranssi-tumma"><div class="swatch-bar" style="background:#602000"></div><div class="swatch-info"><span class="swatch-name">--oranssi-tumma</span><span class="swatch-hex">#602000</span></div></a>
+      <a class="swatch" href="#oranssi-keski"><div class="swatch-bar" style="background:#903010"></div><div class="swatch-info"><span class="swatch-name">--oranssi-keski</span><span class="swatch-hex">#903010</span></div></a>
+      <a class="swatch" href="#terra"><div class="swatch-bar" style="background:#b04020"></div><div class="swatch-info"><span class="swatch-name">--terra</span><span class="swatch-hex">#b04020</span></div></a>
+      <a class="swatch" href="#oranssi"><div class="swatch-bar" style="background:#c84818"></div><div class="swatch-info"><span class="swatch-name">--oranssi</span><span class="swatch-hex">#c84818</span></div></a>
+      <a class="swatch" href="#paprika"><div class="swatch-bar" style="background:#d04020"></div><div class="swatch-info"><span class="swatch-name">--paprika</span><span class="swatch-hex">#d04020</span></div></a>
+      <a class="swatch" href="#terra-kirkas"><div class="swatch-bar" style="background:#c85030"></div><div class="swatch-info"><span class="swatch-name">--terra-kirkas</span><span class="swatch-hex">#c85030</span></div></a>
+      <a class="swatch" href="#oranssi-kirkas"><div class="swatch-bar" style="background:#e05820"></div><div class="swatch-info"><span class="swatch-name">--oranssi-kirkas</span><span class="swatch-hex">#e05820</span></div></a>
+      <a class="swatch" href="#oranssi-lämmin"><div class="swatch-bar" style="background:#f06830"></div><div class="swatch-info"><span class="swatch-name">--oranssi-lämmin</span><span class="swatch-hex">#f06830</span></div></a>
+      <a class="swatch" href="#ruusunpunainen"><div class="swatch-bar" style="background:#e06858"></div><div class="swatch-info"><span class="swatch-name">--ruusunpunainen</span><span class="swatch-hex">#e06858</span></div></a>
+      <a class="swatch" href="#oranssi-vaalea"><div class="swatch-bar" style="background:#f48050"></div><div class="swatch-info"><span class="swatch-name">--oranssi-vaalea</span><span class="swatch-hex">#f48050</span></div></a>
+      <a class="swatch" href="#pinkki-lämmin"><div class="swatch-bar" style="background:#e88070"></div><div class="swatch-info"><span class="swatch-name">--pinkki-lämmin</span><span class="swatch-hex">#e88070</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── ruska-tuli ── -->
+  <div class="register">
+    <div class="register-label">ruska-tuli</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#ruska-syvä"><div class="swatch-bar" style="background:#2a0808"></div><div class="swatch-info"><span class="swatch-name">--ruska-syvä</span><span class="swatch-hex">#2a0808</span></div></a>
+      <a class="swatch" href="#ruska-tumma"><div class="swatch-bar" style="background:#480c0c"></div><div class="swatch-info"><span class="swatch-name">--ruska-tumma</span><span class="swatch-hex">#480c0c</span></div></a>
+      <a class="swatch" href="#multa"><div class="swatch-bar" style="background:#5a1c10"></div><div class="swatch-info"><span class="swatch-name">--multa</span><span class="swatch-hex">#5a1c10</span></div></a>
+      <a class="swatch" href="#ruska-keski"><div class="swatch-bar" style="background:#7a2818"></div><div class="swatch-info"><span class="swatch-name">--ruska-keski</span><span class="swatch-hex">#7a2818</span></div></a>
+      <a class="swatch" href="#ruska-lämmin"><div class="swatch-bar" style="background:#9a3820"></div><div class="swatch-info"><span class="swatch-name">--ruska-lämmin</span><span class="swatch-hex">#9a3820</span></div></a>
+      <a class="swatch" href="#ruska"><div class="swatch-bar" style="background:#d84830"></div><div class="swatch-info"><span class="swatch-name">--ruska</span><span class="swatch-hex">#d84830</span></div></a>
+      <a class="swatch" href="#ruska-kirkas"><div class="swatch-bar" style="background:#e05838"></div><div class="swatch-info"><span class="swatch-name">--ruska-kirkas</span><span class="swatch-hex">#e05838</span></div></a>
+      <a class="swatch" href="#tuli-tumma"><div class="swatch-bar" style="background:#c82820"></div><div class="swatch-info"><span class="swatch-name">--tuli-tumma</span><span class="swatch-hex">#c82820</span></div></a>
+      <a class="swatch" href="#tuli"><div class="swatch-bar" style="background:#e83820"></div><div class="swatch-info"><span class="swatch-name">--tuli</span><span class="swatch-hex">#e83820</span></div></a>
+      <a class="swatch" href="#tuli-kirkas"><div class="swatch-bar" style="background:#f04838"></div><div class="swatch-info"><span class="swatch-name">--tuli-kirkas</span><span class="swatch-hex">#f04838</span></div></a>
+      <a class="swatch" href="#tuli-vaalea"><div class="swatch-bar" style="background:#f87860"></div><div class="swatch-info"><span class="swatch-name">--tuli-vaalea</span><span class="swatch-hex">#f87860</span></div></a>
+      <a class="swatch" href="#ruoste-tumma"><div class="swatch-bar" style="background:#8a5030"></div><div class="swatch-info"><span class="swatch-name">--ruoste-tumma</span><span class="swatch-hex">#8a5030</span></div></a>
+      <a class="swatch" href="#ruoste"><div class="swatch-bar" style="background:#b89068"></div><div class="swatch-info"><span class="swatch-name">--ruoste</span><span class="swatch-hex">#b89068</span></div></a>
+      <a class="swatch" href="#ruoste-kirkas"><div class="swatch-bar" style="background:#c8a070"></div><div class="swatch-info"><span class="swatch-name">--ruoste-kirkas</span><span class="swatch-hex">#c8a070</span></div></a>
+      <a class="swatch" href="#paju"><div class="swatch-bar" style="background:#c09060"></div><div class="swatch-info"><span class="swatch-name">--paju</span><span class="swatch-hex">#c09060</span></div></a>
+      <a class="swatch" href="#paju-kirkas"><div class="swatch-bar" style="background:#d0a878"></div><div class="swatch-info"><span class="swatch-name">--paju-kirkas</span><span class="swatch-hex">#d0a878</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── paju-kaura ── -->
+  <div class="register">
+    <div class="register-label">paju-kaura</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#savi"><div class="swatch-bar" style="background:#6a5038"></div><div class="swatch-info"><span class="swatch-name">--savi</span><span class="swatch-hex">#6a5038</span></div></a>
+      <a class="swatch" href="#savi-kirkas"><div class="swatch-bar" style="background:#7a6048"></div><div class="swatch-info"><span class="swatch-name">--savi-kirkas</span><span class="swatch-hex">#7a6048</span></div></a>
+      <a class="swatch" href="#sienna"><div class="swatch-bar" style="background:#8a7058"></div><div class="swatch-info"><span class="swatch-name">--sienna</span><span class="swatch-hex">#8a7058</span></div></a>
+      <a class="swatch" href="#kaarna"><div class="swatch-bar" style="background:#9a8068"></div><div class="swatch-info"><span class="swatch-name">--kaarna</span><span class="swatch-hex">#9a8068</span></div></a>
+      <a class="swatch" href="#kaarna-kirkas"><div class="swatch-bar" style="background:#aa9078"></div><div class="swatch-info"><span class="swatch-name">--kaarna-kirkas</span><span class="swatch-hex">#aa9078</span></div></a>
+      <a class="swatch" href="#kaneli"><div class="swatch-bar" style="background:#b89878"></div><div class="swatch-info"><span class="swatch-name">--kaneli</span><span class="swatch-hex">#b89878</span></div></a>
+      <a class="swatch" href="#kaneli-kirkas"><div class="swatch-bar" style="background:#c8a888"></div><div class="swatch-info"><span class="swatch-name">--kaneli-kirkas</span><span class="swatch-hex">#c8a888</span></div></a>
+      <a class="swatch" href="#paju-tumma"><div class="swatch-bar" style="background:#a07848"></div><div class="swatch-info"><span class="swatch-name">--paju-tumma</span><span class="swatch-hex">#a07848</span></div></a>
+      <a class="swatch" href="#trabant-beige"><div class="swatch-bar" style="background:#c4a87a"></div><div class="swatch-info"><span class="swatch-name">--trabant-beige</span><span class="swatch-hex">#c4a87a</span></div></a>
+      <a class="swatch" href="#hiekka-lämmin"><div class="swatch-bar" style="background:#b89878"></div><div class="swatch-info"><span class="swatch-name">--hiekka-lämmin</span><span class="swatch-hex">#b89878</span></div></a>
+      <a class="swatch" href="#trabant-vaalea"><div class="swatch-bar" style="background:#d4c090"></div><div class="swatch-info"><span class="swatch-name">--trabant-vaalea</span><span class="swatch-hex">#d4c090</span></div></a>
+      <a class="swatch" href="#trabant-cream"><div class="swatch-bar" style="background:#e0d0a8"></div><div class="swatch-info"><span class="swatch-name">--trabant-cream</span><span class="swatch-hex">#e0d0a8</span></div></a>
+      <a class="swatch" href="#trabant-elfenbein"><div class="swatch-bar" style="background:#e8dfc0"></div><div class="swatch-info"><span class="swatch-name">--trabant-elfenbein</span><span class="swatch-hex">#e8dfc0</span></div></a>
+      <a class="swatch" href="#lada-beige"><div class="swatch-bar" style="background:#d8c89c"></div><div class="swatch-info"><span class="swatch-name">--lada-beige</span><span class="swatch-hex">#d8c89c</span></div></a>
+      <a class="swatch" href="#kaura-tumma"><div class="swatch-bar" style="background:#e0d4a8"></div><div class="swatch-info"><span class="swatch-name">--kaura-tumma</span><span class="swatch-hex">#e0d4a8</span></div></a>
+      <a class="swatch" href="#benz-creme"><div class="swatch-bar" style="background:#e8e0c8"></div><div class="swatch-info"><span class="swatch-name">--benz-creme</span><span class="swatch-hex">#e8e0c8</span></div></a>
+      <a class="swatch" href="#vw-creme"><div class="swatch-bar" style="background:#f0ecd0"></div><div class="swatch-info"><span class="swatch-name">--vw-creme</span><span class="swatch-hex">#f0ecd0</span></div></a>
+      <a class="swatch" href="#pellava-lämmin"><div class="swatch-bar" style="background:#f4ecd8"></div><div class="swatch-info"><span class="swatch-name">--pellava-lämmin</span><span class="swatch-hex">#f4ecd8</span></div></a>
+      <a class="swatch" href="#kerma"><div class="swatch-bar" style="background:#f8f0e0"></div><div class="swatch-info"><span class="swatch-name">--kerma</span><span class="swatch-hex">#f8f0e0</span></div></a>
+      <a class="swatch" href="#kerma-kirkas"><div class="swatch-bar" style="background:#fdf8f0"></div><div class="swatch-info"><span class="swatch-name">--kerma-kirkas</span><span class="swatch-hex">#fdf8f0</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── vihreä ── -->
+  <div class="register">
+    <div class="register-label">vihreä</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#metsä-yö"><div class="swatch-bar" style="background:#0c1808"></div><div class="swatch-info"><span class="swatch-name">--metsä-yö</span><span class="swatch-hex">#0c1808</span></div></a>
+      <a class="swatch" href="#metsä-syvä"><div class="swatch-bar" style="background:#142010"></div><div class="swatch-info"><span class="swatch-name">--metsä-syvä</span><span class="swatch-hex">#142010</span></div></a>
+      <a class="swatch" href="#kuusi"><div class="swatch-bar" style="background:#1e3018"></div><div class="swatch-info"><span class="swatch-name">--kuusi</span><span class="swatch-hex">#1e3018</span></div></a>
+      <a class="swatch" href="#kuusi-kirkas"><div class="swatch-bar" style="background:#284020"></div><div class="swatch-info"><span class="swatch-name">--kuusi-kirkas</span><span class="swatch-hex">#284020</span></div></a>
+      <a class="swatch" href="#mänty"><div class="swatch-bar" style="background:#304828"></div><div class="swatch-info"><span class="swatch-name">--mänty</span><span class="swatch-hex">#304828</span></div></a>
+      <a class="swatch" href="#mänty-kirkas"><div class="swatch-bar" style="background:#3c5830"></div><div class="swatch-info"><span class="swatch-name">--mänty-kirkas</span><span class="swatch-hex">#3c5830</span></div></a>
+      <a class="swatch" href="#sammal-syvä"><div class="swatch-bar" style="background:#486838"></div><div class="swatch-info"><span class="swatch-name">--sammal-syvä</span><span class="swatch-hex">#486838</span></div></a>
+      <a class="swatch" href="#sammal"><div class="swatch-bar" style="background:#607840"></div><div class="swatch-info"><span class="swatch-name">--sammal</span><span class="swatch-hex">#607840</span></div></a>
+      <a class="swatch" href="#sammal-kirkas"><div class="swatch-bar" style="background:#708848"></div><div class="swatch-info"><span class="swatch-name">--sammal-kirkas</span><span class="swatch-hex">#708848</span></div></a>
+      <a class="swatch" href="#lada-vihreä"><div class="swatch-bar" style="background:#507840"></div><div class="swatch-info"><span class="swatch-name">--lada-vihreä</span><span class="swatch-hex">#507840</span></div></a>
+      <a class="swatch" href="#lada-vihreä-kirkas"><div class="swatch-bar" style="background:#608850"></div><div class="swatch-info"><span class="swatch-name">--lada-vihreä-kirkas</span><span class="swatch-hex">#608850</span></div></a>
+      <a class="swatch" href="#vw-vihreä"><div class="swatch-bar" style="background:#789c50"></div><div class="swatch-info"><span class="swatch-name">--vw-vihreä</span><span class="swatch-hex">#789c50</span></div></a>
+      <a class="swatch" href="#lehto-tumma"><div class="swatch-bar" style="background:#6a9030"></div><div class="swatch-info"><span class="swatch-name">--lehto-tumma</span><span class="swatch-hex">#6a9030</span></div></a>
+      <a class="swatch" href="#lehto"><div class="swatch-bar" style="background:#90c830"></div><div class="swatch-info"><span class="swatch-name">--lehto</span><span class="swatch-hex">#90c830</span></div></a>
+      <a class="swatch" href="#trabant-vihreä"><div class="swatch-bar" style="background:#8ac068"></div><div class="swatch-info"><span class="swatch-name">--trabant-vihreä</span><span class="swatch-hex">#8ac068</span></div></a>
+      <a class="swatch" href="#lehto-kirkas"><div class="swatch-bar" style="background:#a0d840"></div><div class="swatch-info"><span class="swatch-name">--lehto-kirkas</span><span class="swatch-hex">#a0d840</span></div></a>
+      <a class="swatch" href="#trabant-minttu"><div class="swatch-bar" style="background:#78b890"></div><div class="swatch-info"><span class="swatch-name">--trabant-minttu</span><span class="swatch-hex">#78b890</span></div></a>
+      <a class="swatch" href="#minttu"><div class="swatch-bar" style="background:#90c8a8"></div><div class="swatch-info"><span class="swatch-name">--minttu</span><span class="swatch-hex">#90c8a8</span></div></a>
+      <a class="swatch" href="#salvia"><div class="swatch-bar" style="background:#a8d4b8"></div><div class="swatch-info"><span class="swatch-name">--salvia</span><span class="swatch-hex">#a8d4b8</span></div></a>
+      <a class="swatch" href="#haapa-tumma"><div class="swatch-bar" style="background:#98bc78"></div><div class="swatch-info"><span class="swatch-name">--haapa-tumma</span><span class="swatch-hex">#98bc78</span></div></a>
+      <a class="swatch" href="#haapa"><div class="swatch-bar" style="background:#c8e0b0"></div><div class="swatch-info"><span class="swatch-name">--haapa</span><span class="swatch-hex">#c8e0b0</span></div></a>
+      <a class="swatch" href="#haapa-kirkas"><div class="swatch-bar" style="background:#d8ecc0"></div><div class="swatch-info"><span class="swatch-name">--haapa-kirkas</span><span class="swatch-hex">#d8ecc0</span></div></a>
+      <a class="swatch" href="#koivu-lehti"><div class="swatch-bar" style="background:#e0ecd0"></div><div class="swatch-info"><span class="swatch-name">--koivu-lehti</span><span class="swatch-hex">#e0ecd0</span></div></a>
+      <a class="swatch" href="#koivu-kirkas"><div class="swatch-bar" style="background:#ecf4e0"></div><div class="swatch-info"><span class="swatch-name">--koivu-kirkas</span><span class="swatch-hex">#ecf4e0</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── sininen ── -->
+  <div class="register">
+    <div class="register-label">sininen</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#syvänmeri"><div class="swatch-bar" style="background:#081820"></div><div class="swatch-info"><span class="swatch-name">--syvänmeri</span><span class="swatch-hex">#081820</span></div></a>
+      <a class="swatch" href="#meren-yö"><div class="swatch-bar" style="background:#0c2030"></div><div class="swatch-info"><span class="swatch-name">--meren-yö</span><span class="swatch-hex">#0c2030</span></div></a>
+      <a class="swatch" href="#järvi-yö"><div class="swatch-bar" style="background:#102838"></div><div class="swatch-info"><span class="swatch-name">--järvi-yö</span><span class="swatch-hex">#102838</span></div></a>
+      <a class="swatch" href="#benz-yö"><div class="swatch-bar" style="background:#182840"></div><div class="swatch-info"><span class="swatch-name">--benz-yö</span><span class="swatch-hex">#182840</span></div></a>
+      <a class="swatch" href="#meri-syvä"><div class="swatch-bar" style="background:#183848"></div><div class="swatch-info"><span class="swatch-name">--meri-syvä</span><span class="swatch-hex">#183848</span></div></a>
+      <a class="swatch" href="#järvi-syvä"><div class="swatch-bar" style="background:#204858"></div><div class="swatch-info"><span class="swatch-name">--järvi-syvä</span><span class="swatch-hex">#204858</span></div></a>
+      <a class="swatch" href="#teräs"><div class="swatch-bar" style="background:#285870"></div><div class="swatch-info"><span class="swatch-name">--teräs</span><span class="swatch-hex">#285870</span></div></a>
+      <a class="swatch" href="#lada-sininen"><div class="swatch-bar" style="background:#385880"></div><div class="swatch-info"><span class="swatch-name">--lada-sininen</span><span class="swatch-hex">#385880</span></div></a>
+      <a class="swatch" href="#vw-helios"><div class="swatch-bar" style="background:#3868a0"></div><div class="swatch-info"><span class="swatch-name">--vw-helios</span><span class="swatch-hex">#3868a0</span></div></a>
+      <a class="swatch" href="#järvi"><div class="swatch-bar" style="background:#3a7890"></div><div class="swatch-info"><span class="swatch-name">--järvi</span><span class="swatch-hex">#3a7890</span></div></a>
+      <a class="swatch" href="#järvi-kirkas"><div class="swatch-bar" style="background:#4888a0"></div><div class="swatch-info"><span class="swatch-name">--järvi-kirkas</span><span class="swatch-hex">#4888a0</span></div></a>
+      <a class="swatch" href="#meri"><div class="swatch-bar" style="background:#40a0b0"></div><div class="swatch-info"><span class="swatch-name">--meri</span><span class="swatch-hex">#40a0b0</span></div></a>
+      <a class="swatch" href="#meri-kirkas"><div class="swatch-bar" style="background:#50b0c0"></div><div class="swatch-info"><span class="swatch-name">--meri-kirkas</span><span class="swatch-hex">#50b0c0</span></div></a>
+      <a class="swatch" href="#trabant-sininen"><div class="swatch-bar" style="background:#5080a0"></div><div class="swatch-info"><span class="swatch-name">--trabant-sininen</span><span class="swatch-hex">#5080a0</span></div></a>
+      <a class="swatch" href="#taivas-syvä"><div class="swatch-bar" style="background:#5898b0"></div><div class="swatch-info"><span class="swatch-name">--taivas-syvä</span><span class="swatch-hex">#5898b0</span></div></a>
+      <a class="swatch" href="#taivas"><div class="swatch-bar" style="background:#80b8cc"></div><div class="swatch-info"><span class="swatch-name">--taivas</span><span class="swatch-hex">#80b8cc</span></div></a>
+      <a class="swatch" href="#trabant-taivassininen"><div class="swatch-bar" style="background:#88b8d0"></div><div class="swatch-info"><span class="swatch-name">--trabant-taivassininen</span><span class="swatch-hex">#88b8d0</span></div></a>
+      <a class="swatch" href="#taivas-kirkas"><div class="swatch-bar" style="background:#90c8d8"></div><div class="swatch-info"><span class="swatch-name">--taivas-kirkas</span><span class="swatch-hex">#90c8d8</span></div></a>
+      <a class="swatch" href="#jää-tumma"><div class="swatch-bar" style="background:#90c0d0"></div><div class="swatch-info"><span class="swatch-name">--jää-tumma</span><span class="swatch-hex">#90c0d0</span></div></a>
+      <a class="swatch" href="#jää"><div class="swatch-bar" style="background:#b8d8e0"></div><div class="swatch-info"><span class="swatch-name">--jää</span><span class="swatch-hex">#b8d8e0</span></div></a>
+      <a class="swatch" href="#jää-kirkas"><div class="swatch-bar" style="background:#c8e4ec"></div><div class="swatch-info"><span class="swatch-name">--jää-kirkas</span><span class="swatch-hex">#c8e4ec</span></div></a>
+      <a class="swatch" href="#jää-vaalea"><div class="swatch-bar" style="background:#d8eef4"></div><div class="swatch-info"><span class="swatch-name">--jää-vaalea</span><span class="swatch-hex">#d8eef4</span></div></a>
+      <a class="swatch" href="#viileä-vaalea"><div class="swatch-bar" style="background:#e0f0f8"></div><div class="swatch-info"><span class="swatch-name">--viileä-vaalea</span><span class="swatch-hex">#e0f0f8</span></div></a>
+      <a class="swatch" href="#arktinen"><div class="swatch-bar" style="background:#ecf8fc"></div><div class="swatch-info"><span class="swatch-name">--arktinen</span><span class="swatch-hex">#ecf8fc</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── violetti ── -->
+  <div class="register">
+    <div class="register-label">violetti</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#violetti-syvä"><div class="swatch-bar" style="background:#18081c"></div><div class="swatch-info"><span class="swatch-name">--violetti-syvä</span><span class="swatch-hex">#18081c</span></div></a>
+      <a class="swatch" href="#violetti-tumma"><div class="swatch-bar" style="background:#280d30"></div><div class="swatch-info"><span class="swatch-name">--violetti-tumma</span><span class="swatch-hex">#280d30</span></div></a>
+      <a class="swatch" href="#violetti-keski"><div class="swatch-bar" style="background:#4a1858"></div><div class="swatch-info"><span class="swatch-name">--violetti-keski</span><span class="swatch-hex">#4a1858</span></div></a>
+      <a class="swatch" href="#violetti"><div class="swatch-bar" style="background:#702890"></div><div class="swatch-info"><span class="swatch-name">--violetti</span><span class="swatch-hex">#702890</span></div></a>
+      <a class="swatch" href="#liila-tumma"><div class="swatch-bar" style="background:#9038a8"></div><div class="swatch-info"><span class="swatch-name">--liila-tumma</span><span class="swatch-hex">#9038a8</span></div></a>
+      <a class="swatch" href="#liila"><div class="swatch-bar" style="background:#b858c0"></div><div class="swatch-info"><span class="swatch-name">--liila</span><span class="swatch-hex">#b858c0</span></div></a>
+      <a class="swatch" href="#liila-kirkas"><div class="swatch-bar" style="background:#cc78d0"></div><div class="swatch-info"><span class="swatch-name">--liila-kirkas</span><span class="swatch-hex">#cc78d0</span></div></a>
+      <a class="swatch" href="#liila-vaalea"><div class="swatch-bar" style="background:#e0a8e0"></div><div class="swatch-info"><span class="swatch-name">--liila-vaalea</span><span class="swatch-hex">#e0a8e0</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── automotive ── -->
+  <div class="register">
+    <div class="register-label">automotive</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#auto-trabant-standardbeige"><div class="swatch-bar" style="background:#c4a87a"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-standardbeige</span><span class="swatch-hex">#c4a87a</span></div></a>
+      <a class="swatch" href="#auto-trabant-elfenbein"><div class="swatch-bar" style="background:#e8dfc0"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-elfenbein</span><span class="swatch-hex">#e8dfc0</span></div></a>
+      <a class="swatch" href="#auto-trabant-cremeweis"><div class="swatch-bar" style="background:#f0e8d0"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-cremeweis</span><span class="swatch-hex">#f0e8d0</span></div></a>
+      <a class="swatch" href="#auto-trabant-korallrot"><div class="swatch-bar" style="background:#d84838"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-korallrot</span><span class="swatch-hex">#d84838</span></div></a>
+      <a class="swatch" href="#auto-trabant-blassgruen"><div class="swatch-bar" style="background:#8ac068"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-blassgruen</span><span class="swatch-hex">#8ac068</span></div></a>
+      <a class="swatch" href="#auto-trabant-mintgruen"><div class="swatch-bar" style="background:#78b890"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-mintgruen</span><span class="swatch-hex">#78b890</span></div></a>
+      <a class="swatch" href="#auto-trabant-hellblau"><div class="swatch-bar" style="background:#88b8d0"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-hellblau</span><span class="swatch-hex">#88b8d0</span></div></a>
+      <a class="swatch" href="#auto-trabant-patina"><div class="swatch-bar" style="background:#b89068"></div><div class="swatch-info"><span class="swatch-name">--auto-trabant-patina</span><span class="swatch-hex">#b89068</span></div></a>
+      <a class="swatch" href="#auto-lada-weis"><div class="swatch-bar" style="background:#f0f0e8"></div><div class="swatch-info"><span class="swatch-name">--auto-lada-weis</span><span class="swatch-hex">#f0f0e8</span></div></a>
+      <a class="swatch" href="#auto-lada-beige"><div class="swatch-bar" style="background:#d8c89c"></div><div class="swatch-info"><span class="swatch-name">--auto-lada-beige</span><span class="swatch-hex">#d8c89c</span></div></a>
+      <a class="swatch" href="#auto-lada-vihrea"><div class="swatch-bar" style="background:#507840"></div><div class="swatch-info"><span class="swatch-name">--auto-lada-vihrea</span><span class="swatch-hex">#507840</span></div></a>
+      <a class="swatch" href="#auto-lada-sininen"><div class="swatch-bar" style="background:#385880"></div><div class="swatch-info"><span class="swatch-name">--auto-lada-sininen</span><span class="swatch-hex">#385880</span></div></a>
+      <a class="swatch" href="#auto-vw-marsrot"><div class="swatch-bar" style="background:#b03028"></div><div class="swatch-info"><span class="swatch-name">--auto-vw-marsrot</span><span class="swatch-hex">#b03028</span></div></a>
+      <a class="swatch" href="#auto-vw-heliosblau"><div class="swatch-bar" style="background:#3868a0"></div><div class="swatch-info"><span class="swatch-name">--auto-vw-heliosblau</span><span class="swatch-hex">#3868a0</span></div></a>
+      <a class="swatch" href="#auto-vw-hellgelb"><div class="swatch-bar" style="background:#f0d840"></div><div class="swatch-info"><span class="swatch-name">--auto-vw-hellgelb</span><span class="swatch-hex">#f0d840</span></div></a>
+      <a class="swatch" href="#auto-vw-silber"><div class="swatch-bar" style="background:#a0a8a8"></div><div class="swatch-info"><span class="swatch-name">--auto-vw-silber</span><span class="swatch-hex">#a0a8a8</span></div></a>
+      <a class="swatch" href="#auto-benz-silber"><div class="swatch-bar" style="background:#b0b8b8"></div><div class="swatch-info"><span class="swatch-name">--auto-benz-silber</span><span class="swatch-hex">#b0b8b8</span></div></a>
+      <a class="swatch" href="#auto-benz-nachtblau"><div class="swatch-bar" style="background:#182840"></div><div class="swatch-info"><span class="swatch-name">--auto-benz-nachtblau</span><span class="swatch-hex">#182840</span></div></a>
+      <a class="swatch" href="#auto-benz-schwarz"><div class="swatch-bar" style="background:#181818"></div><div class="swatch-info"><span class="swatch-name">--auto-benz-schwarz</span><span class="swatch-hex">#181818</span></div></a>
+      <a class="swatch" href="#auto-benz-creme"><div class="swatch-bar" style="background:#e8e0c8"></div><div class="swatch-info"><span class="swatch-name">--auto-benz-creme</span><span class="swatch-hex">#e8e0c8</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── filmi ── -->
+  <div class="register">
+    <div class="register-label">filmi</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#filmi-pohja"><div class="swatch-bar" style="background:#141a10"></div><div class="swatch-info"><span class="swatch-name">--filmi-pohja</span><span class="swatch-hex">#141a10</span></div></a>
+      <a class="swatch" href="#filmi-sumu"><div class="swatch-bar" style="background:#1e2618"></div><div class="swatch-info"><span class="swatch-name">--filmi-sumu</span><span class="swatch-hex">#1e2618</span></div></a>
+      <a class="swatch" href="#filmi-varjo"><div class="swatch-bar" style="background:#283820"></div><div class="swatch-info"><span class="swatch-name">--filmi-varjo</span><span class="swatch-hex">#283820</span></div></a>
+      <a class="swatch" href="#filmi-vihertävä"><div class="swatch-bar" style="background:#3a4828"></div><div class="swatch-info"><span class="swatch-name">--filmi-vihertävä</span><span class="swatch-hex">#3a4828</span></div></a>
+      <a class="swatch" href="#filmi-rae"><div class="swatch-bar" style="background:#4a5038"></div><div class="swatch-info"><span class="swatch-name">--filmi-rae</span><span class="swatch-hex">#4a5038</span></div></a>
+      <a class="swatch" href="#filmi-harmaa"><div class="swatch-bar" style="background:#60605a"></div><div class="swatch-info"><span class="swatch-name">--filmi-harmaa</span><span class="swatch-hex">#60605a</span></div></a>
+      <a class="swatch" href="#filmi-keski"><div class="swatch-bar" style="background:#8a8060"></div><div class="swatch-info"><span class="swatch-name">--filmi-keski</span><span class="swatch-hex">#8a8060</span></div></a>
+      <a class="swatch" href="#filmi-patinoitu"><div class="swatch-bar" style="background:#a89068"></div><div class="swatch-info"><span class="swatch-name">--filmi-patinoitu</span><span class="swatch-hex">#a89068</span></div></a>
+      <a class="swatch" href="#filmi-halo"><div class="swatch-bar" style="background:#c8a050"></div><div class="swatch-info"><span class="swatch-name">--filmi-halo</span><span class="swatch-hex">#c8a050</span></div></a>
+      <a class="swatch" href="#filmi-palo"><div class="swatch-bar" style="background:#e0c870"></div><div class="swatch-info"><span class="swatch-name">--filmi-palo</span><span class="swatch-hex">#e0c870</span></div></a>
+      <a class="swatch" href="#filmi-ylialtistus"><div class="swatch-bar" style="background:#f0dca0"></div><div class="swatch-info"><span class="swatch-name">--filmi-ylialtistus</span><span class="swatch-hex">#f0dca0</span></div></a>
+      <a class="swatch" href="#filmi-magenta"><div class="swatch-bar" style="background:#987880"></div><div class="swatch-info"><span class="swatch-name">--filmi-magenta</span><span class="swatch-hex">#987880</span></div></a>
+    </div>
+  </div>
+
+
+  <hr class="amber">
+  <div class="lexicon-label">lexicon — LEXICON_PLACEHOLDER</div>
+
+
+  <footer class="site-footer">
+    <a href="https://github.com/jmcgill-public/kaiku/tree/main/contrib" style="color:inherit;text-decoration:none;">kaiku</a> / <a href="/" style="color:inherit;text-decoration:none;">rebraining.org</a> &mdash; 268 tones &mdash; not flat, not digital primary, chosen
+  </footer>
+
+</div>
+</body>
+</html>

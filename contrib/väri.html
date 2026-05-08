@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>väri — kaiku</title>
+<link rel="stylesheet" href="/palette.css">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.65;
+    padding: 0 0 8rem;
+  }
+
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── header ── */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.75rem 0 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .kicker {
+    font-family: 'Courier New', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 0.35rem;
+  }
+
+  .kicker a { color: inherit; text-decoration: none; }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: var(--meripihka);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── register sections ── */
+  .register {
+    margin-bottom: 1.25rem;
+  }
+
+  .register-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 0.4rem;
+    opacity: 0.7;
+  }
+
+  /* ── dense swatch grid ── */
+  .swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  a.swatch {
+    display: block;
+    width: 100px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.04);
+    text-decoration: none;
+    transition: border-color 0.12s;
+    flex-shrink: 0;
+  }
+
+  a.swatch:hover { border-color: var(--meripihka-dim); }
+
+  .swatch-bar {
+    height: 40px;
+    width: 100%;
+  }
+
+  .swatch-info {
+    background: var(--kuilu-syvä);
+    padding: 3px 5px 4px;
+  }
+
+  .swatch-name {
+    font-family: 'Courier New', monospace;
+    font-size: 0.56rem;
+    color: var(--meripihka-dim);
+    display: block;
+    line-height: 1.3;
+    word-break: break-all;
+  }
+
+  .swatch-hex {
+    font-family: 'Courier New', monospace;
+    font-size: 0.56rem;
+    color: var(--hopea);
+    display: block;
+  }
+
+  /* ── amber rule ── */
+  hr.amber {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--meripihka-dim), transparent);
+    margin: 2.25rem 0;
+  }
+
+  /* ── lexicon ── */
+  .lexicon-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    margin-bottom: 1.75rem;
+    opacity: 0.7;
+  }
+
+  .entry {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.25rem;
+    scroll-margin-top: 1.5rem;
+    align-items: flex-start;
+  }
+
+  /* ── pip shapes — bullet icon, clicking returns to palette top ── */
+  a.entry-pip {
+    display: block;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: opacity 0.12s, transform 0.12s;
+    margin-top: 0.28rem;
+  }
+
+  a.entry-pip:hover { opacity: 0.75; transform: scale(1.12); }
+
+  /* hiljaisuus / silence / panel — hexagonal */
+  a.entry-pip.shape-hex {
+    width: 22px;
+    height: 22px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  /* musical / signal — oval */
+  a.entry-pip.shape-oval {
+    width: 28px;
+    height: 16px;
+    border-radius: 50%;
+    margin-top: 0.45rem;
+  }
+
+  /* foliage / display — round */
+  a.entry-pip.shape-round {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-top: 0.22rem;
+  }
+
+  /* berlin + bauhaus / cool — square */
+  a.entry-pip.shape-square {
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+    margin-top: 0.22rem;
+  }
+
+  /* labels / unregistered — flat bar */
+  a.entry-pip.shape-bar {
+    width: 36px;
+    height: 7px;
+    border-radius: 1px;
+    margin-top: 0.58rem;
+  }
+
+  .entry-content { flex: 1; }
+
+  .entry-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .entry-term {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--meripihka);
+    letter-spacing: 0.04em;
+  }
+
+  .entry-hex {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--hopea);
+  }
+
+  .entry-tag {
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--meripihka-dim);
+    opacity: 0.7;
+  }
+
+  .entry-body {
+    color: var(--text);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-top: 0.2rem;
+  }
+
+  .entry-body .fi {
+    font-style: italic;
+    color: var(--meripihka-dim);
+  }
+
+  /* ── footer ── */
+  .site-footer {
+    border-top: 1px solid var(--varjo);
+    margin-top: 5rem;
+    padding-top: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.1em;
+    color: var(--meripihka-dim);
+    opacity: 0.6;
+  }
+
+  @media (max-width: 500px) {
+    a.swatch { width: 84px; }
+  }
+
+</style>
+<link rel="icon" id="favicon" type="image/svg+xml" href="">
+<script src="/favicon.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <div class="kicker"><a href="/">rebraining.org</a> / kaiku</div>
+    <h1>väri</h1>
+  </header>
+
+
+  <!-- ── PANEL ── -->
+  <div class="register">
+    <div class="register-label">panel</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#tyhjyys"><div class="swatch-bar" style="background:#0c0c0c"></div><div class="swatch-info"><span class="swatch-name">--tyhjyys</span><span class="swatch-hex">#0c0c0c</span></div></a>
+      <a class="swatch" href="#tyhjyys-lämmin"><div class="swatch-bar" style="background:#0e0c0a"></div><div class="swatch-info"><span class="swatch-name">--tyhjyys-lämmin</span><span class="swatch-hex">#0e0c0a</span></div></a>
+      <a class="swatch" href="#kuilu"><div class="swatch-bar" style="background:#141210"></div><div class="swatch-info"><span class="swatch-name">--kuilu</span><span class="swatch-hex">#141210</span></div></a>
+      <a class="swatch" href="#kuilu-syvä"><div class="swatch-bar" style="background:#181614"></div><div class="swatch-info"><span class="swatch-name">--kuilu-syvä</span><span class="swatch-hex">#181614</span></div></a>
+      <a class="swatch" href="#kolkko"><div class="swatch-bar" style="background:#1c1a16"></div><div class="swatch-info"><span class="swatch-name">--kolkko</span><span class="swatch-hex">#1c1a16</span></div></a>
+      <a class="swatch" href="#varjo"><div class="swatch-bar" style="background:#201e18"></div><div class="swatch-info"><span class="swatch-name">--varjo</span><span class="swatch-hex">#201e18</span></div></a>
+      <a class="swatch" href="#varjo-lämmin"><div class="swatch-bar" style="background:#241e16"></div><div class="swatch-info"><span class="swatch-name">--varjo-lämmin</span><span class="swatch-hex">#241e16</span></div></a>
+      <a class="swatch" href="#hämärä-syvä"><div class="swatch-bar" style="background:#2a2018"></div><div class="swatch-info"><span class="swatch-name">--hämärä-syvä</span><span class="swatch-hex">#2a2018</span></div></a>
+      <a class="swatch" href="#hämärä"><div class="swatch-bar" style="background:#2e2418"></div><div class="swatch-info"><span class="swatch-name">--hämärä</span><span class="swatch-hex">#2e2418</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── SIGNAL ── -->
+  <div class="register">
+    <div class="register-label">signal</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#meripihka-hiili"><div class="swatch-bar" style="background:#3a2010"></div><div class="swatch-info"><span class="swatch-name">--meripihka-hiili</span><span class="swatch-hex">#3a2010</span></div></a>
+      <a class="swatch" href="#meripihka-matta"><div class="swatch-bar" style="background:#6a4810"></div><div class="swatch-info"><span class="swatch-name">--meripihka-matta</span><span class="swatch-hex">#6a4810</span></div></a>
+      <a class="swatch" href="#meripihka-dim"><div class="swatch-bar" style="background:#9a6820"></div><div class="swatch-info"><span class="swatch-name">--meripihka-dim</span><span class="swatch-hex">#9a6820</span></div></a>
+      <a class="swatch" href="#meripihka"><div class="swatch-bar" style="background:#f0a030"></div><div class="swatch-info"><span class="swatch-name">--meripihka</span><span class="swatch-hex">#f0a030</span></div></a>
+      <a class="swatch" href="#hehku"><div class="swatch-bar" style="background:#f8c060"></div><div class="swatch-info"><span class="swatch-name">--hehku</span><span class="swatch-hex">#f8c060</span></div></a>
+      <a class="swatch" href="#kipinä"><div class="swatch-bar" style="background:#ffdd80"></div><div class="swatch-info"><span class="swatch-name">--kipinä</span><span class="swatch-hex">#ffdd80</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── DISPLAY ── -->
+  <div class="register">
+    <div class="register-label">display</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#lehto"><div class="swatch-bar" style="background:#90c830"></div><div class="swatch-info"><span class="swatch-name">--lehto</span><span class="swatch-hex">#90c830</span></div></a>
+      <a class="swatch" href="#lehto-kirkas"><div class="swatch-bar" style="background:#a0d840"></div><div class="swatch-info"><span class="swatch-name">--lehto-kirkas</span><span class="swatch-hex">#a0d840</span></div></a>
+      <a class="swatch" href="#sammal"><div class="swatch-bar" style="background:#607840"></div><div class="swatch-info"><span class="swatch-name">--sammal</span><span class="swatch-hex">#607840</span></div></a>
+      <a class="swatch" href="#sammal-kirkas"><div class="swatch-bar" style="background:#708848"></div><div class="swatch-info"><span class="swatch-name">--sammal-kirkas</span><span class="swatch-hex">#708848</span></div></a>
+      <a class="swatch" href="#haapa-kirkas"><div class="swatch-bar" style="background:#d8ecc0"></div><div class="swatch-info"><span class="swatch-name">--haapa-kirkas</span><span class="swatch-hex">#d8ecc0</span></div></a>
+      <a class="swatch" href="#trabant-minttu"><div class="swatch-bar" style="background:#78b890"></div><div class="swatch-info"><span class="swatch-name">--trabant-minttu</span><span class="swatch-hex">#78b890</span></div></a>
+      <a class="swatch" href="#minttu"><div class="swatch-bar" style="background:#90c8a8"></div><div class="swatch-info"><span class="swatch-name">--minttu</span><span class="swatch-hex">#90c8a8</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── LABELS ── -->
+  <div class="register">
+    <div class="register-label">labels</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#norsunluu"><div class="swatch-bar" style="background:#dfd0b0"></div><div class="swatch-info"><span class="swatch-name">--norsunluu</span><span class="swatch-hex">#dfd0b0</span></div></a>
+      <a class="swatch" href="#hiekka"><div class="swatch-bar" style="background:#8a7a60"></div><div class="swatch-info"><span class="swatch-name">--hiekka</span><span class="swatch-hex">#8a7a60</span></div></a>
+      <a class="swatch" href="#tuhka"><div class="swatch-bar" style="background:#4a4030"></div><div class="swatch-info"><span class="swatch-name">--tuhka</span><span class="swatch-hex">#4a4030</span></div></a>
+    </div>
+  </div>
+
+  <!-- ── COOL ── -->
+  <div class="register">
+    <div class="register-label">cool</div>
+    <div class="swatch-row">
+      <a class="swatch" href="#järvi"><div class="swatch-bar" style="background:#3a7890"></div><div class="swatch-info"><span class="swatch-name">--järvi</span><span class="swatch-hex">#3a7890</span></div></a>
+      <a class="swatch" href="#taivas"><div class="swatch-bar" style="background:#80b8cc"></div><div class="swatch-info"><span class="swatch-name">--taivas</span><span class="swatch-hex">#80b8cc</span></div></a>
+    </div>
+  </div>
+
+
+  <hr class="amber">
+  <div class="lexicon-label">lexicon</div>
+
+
+  <!-- ════ PANEL — hexagonal pip (hiljaisuus / silence) ════ -->
+
+  <div class="entry" id="tyhjyys">
+    <a class="entry-pip shape-hex" href="#top" style="background:#0c0c0c" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--tyhjyys</span>
+        <span class="entry-hex">#0c0c0c</span>
+        <span class="entry-tag">panel · ground</span>
+      </div>
+      <div class="entry-body">
+        <span class="fi">Tyhjä</span> (empty, vacant) + <span class="fi">-yys</span> (abstract noun suffix, equivalent to English <em>-ness</em>). Emptiness. Void. Finnish carries no religious weight in this word — it means simply what is not there, a physical absence rather than a philosophical condition. The deepest background. The panel before any signal arrives.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="tyhjyys-lämmin">
+    <a class="entry-pip shape-hex" href="#top" style="background:#0e0c0a" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--tyhjyys-lämmin</span>
+        <span class="entry-hex">#0e0c0a</span>
+        <span class="entry-tag">panel · CRT ground</span>
+      </div>
+      <div class="entry-body">
+        Warm void. <span class="fi">Lämmin</span> = warm. The same emptiness as <span class="fi">tyhjyys</span> but with an amber undertone barely visible — two counts of red above the base. The CRT ground when the phosphor is at rest, the glass still holding heat from the previous session. You only notice the warmth after you have seen the cold version.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="kuilu">
+    <a class="entry-pip shape-hex" href="#top" style="background:#141210" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--kuilu</span>
+        <span class="entry-hex">#141210</span>
+        <span class="entry-tag">panel · elevated surface</span>
+      </div>
+      <div class="entry-body">
+        Chasm, gorge, abyss — a physical gap in the earth, not a philosophical one. The word feels geological. <span class="fi">Kuilu</span> is the step above <span class="fi">tyhjyys</span>: still dark, still void, but there is now a surface. Card backgrounds, panel-on-panel. Something you can place a component on.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="kuilu-syvä">
+    <a class="entry-pip shape-hex" href="#top" style="background:#181614" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--kuilu-syvä</span>
+        <span class="entry-hex">#181614</span>
+        <span class="entry-tag">panel · inset surface</span>
+      </div>
+      <div class="entry-body">
+        Deep chasm. <span class="fi">Syvä</span> = deep. One step further into the rock than <span class="fi">kuilu</span>. Inset surfaces, recessed displays, the inside of a well. Where things go that should feel lower than the panel.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="kolkko">
+    <a class="entry-pip shape-hex" href="#top" style="background:#1c1a16" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--kolkko</span>
+        <span class="entry-hex">#1c1a16</span>
+        <span class="entry-tag">panel · overlay</span>
+      </div>
+      <div class="entry-body">
+        Finnish adjective: bleak, dreary, desolate, forlorn. The specific quality of a place that is empty in a way that makes you feel the emptiness — not threatening, just present, announcing itself through absence. Not the void. The mood of the void. Overlay surfaces, modal grounds.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="varjo">
+    <a class="entry-pip shape-hex" href="#top" style="background:#201e18" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--varjo</span>
+        <span class="entry-hex">#201e18</span>
+        <span class="entry-tag">panel · rule / divider</span>
+      </div>
+      <div class="entry-body">
+        Shadow — specifically the shadow cast by a specific object. Not darkness itself; darkness is <span class="fi">tyhjyys</span>. <span class="fi">Varjo</span> is what happens when something is between you and the light. The shadow is evidence of the light. Primary rule and divider colour.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="varjo-lämmin">
+    <a class="entry-pip shape-hex" href="#top" style="background:#241e16" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--varjo-lämmin</span>
+        <span class="entry-hex">#241e16</span>
+        <span class="entry-tag">panel · warm divider</span>
+      </div>
+      <div class="entry-body">
+        Warm shadow. The same shadow as <span class="fi">varjo</span>, but the light source is amber. The Lada dashboard at dusk. The divider between components when the panel is running warm.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="hämärä-syvä">
+    <a class="entry-pip shape-hex" href="#top" style="background:#2a2018" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--hämärä-syvä</span>
+        <span class="entry-hex">#2a2018</span>
+        <span class="entry-tag">panel · heavy border</span>
+      </div>
+      <div class="entry-body">
+        Deep twilight. <span class="fi">Hämärä</span> names the specific quality of light at dusk or before dawn — neither dark nor lit, the passage between, when objects lose their edges. It also means vague, unclear, morally ambiguous. <span class="fi">Syvä</span> = deep. The heavy border, the line that defines the chassis.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="hämärä">
+    <a class="entry-pip shape-hex" href="#top" style="background:#2e2418" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--hämärä</span>
+        <span class="entry-hex">#2e2418</span>
+        <span class="entry-tag">panel · standard border</span>
+      </div>
+      <div class="entry-body">
+        Twilight. The canonical <span class="fi">hämärä</span>. Standard border colour throughout the system — the line between surfaces, the seam between panels, the boundary of a knob track. Present everywhere, calling for attention nowhere.
+      </div>
+    </div>
+  </div>
+
+  <hr class="amber">
+
+  <!-- ════ SIGNAL — oval pip (musical) ════ -->
+
+  <div class="entry" id="meripihka-hiili">
+    <a class="entry-pip shape-oval" href="#top" style="background:#3a2010" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--meripihka-hiili</span>
+        <span class="entry-hex">#3a2010</span>
+        <span class="entry-tag">signal · knob track at rest</span>
+      </div>
+      <div class="entry-body">
+        Amber coal. <span class="fi">Hiili</span> = coal, carbon, charcoal. Baltic amber reduced to its mineral origin — the organic warmth almost extinguished, just enough remaining to remember it was once resin. The knob track at full rest, unfilled, the ring before any value arrives.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="meripihka-matta">
+    <a class="entry-pip shape-oval" href="#top" style="background:#6a4810" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--meripihka-matta</span>
+        <span class="entry-hex">#6a4810</span>
+        <span class="entry-tag">signal · low-value fill</span>
+      </div>
+      <div class="entry-body">
+        Matte amber. <span class="fi">Matta</span> = matte, flat, without sheen. The amber before it catches the light — the surface of a piece of raw amber not yet polished, not yet translucent. Track fill for values below midpoint. The signal present but not yet alive.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="meripihka-dim">
+    <a class="entry-pip shape-oval" href="#top" style="background:#9a6820" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--meripihka-dim</span>
+        <span class="entry-hex">#9a6820</span>
+        <span class="entry-tag">signal · secondary accent</span>
+      </div>
+      <div class="entry-body">
+        Dim amber. A palette-vocabulary hybrid: <span class="fi">meripihka</span> (Baltic amber) + English <em>dim</em>, chosen because Finnish has no single adjective meaning "reduced luminosity without implication of quality loss." The signal readable but not calling for attention. Secondary labels, subheadings.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="meripihka">
+    <a class="entry-pip shape-oval" href="#top" style="background:#f0a030" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--meripihka</span>
+        <span class="entry-hex">#f0a030</span>
+        <span class="entry-tag">signal · canonical accent</span>
+      </div>
+      <div class="entry-body">
+        Baltic amber. <span class="fi">Meri</span> = sea; <span class="fi">pihka</span> = tree resin, sap. The fossilized resin of Eocene conifers, deposited in what is now the Baltic seabed, eroded out over millennia, washed ashore on the coasts of Lithuania and Prussia, gathered and traded across Bronze Age Europe for five thousand years before the concept of trade had a word. It is literally petrified light — photosynthate captured by a living tree fifty million years before anything like us existed, held in suspension, released when you hold it to the lamp. The canonical signal colour. Knob value at nominal. The alive thing in the void.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="hehku">
+    <a class="entry-pip shape-oval" href="#top" style="background:#f8c060" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--hehku</span>
+        <span class="entry-hex">#f8c060</span>
+        <span class="entry-tag">signal · hover / glow</span>
+      </div>
+      <div class="entry-body">
+        Glow, incandescence. <span class="fi">Hehkua</span> (verb) = to glow with inner heat, to be incandescent — not a flash, not a spark, sustained heat from within. A kiln element. A resistor near its thermal limit. The thing that gives off warmth without a flame you can point to. Knob hover state. The colour that tells you something is about to be changed.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="kipinä">
+    <a class="entry-pip shape-oval" href="#top" style="background:#ffdd80" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--kipinä</span>
+        <span class="entry-hex">#ffdd80</span>
+        <span class="entry-tag">signal · peak / selection</span>
+      </div>
+      <div class="entry-body">
+        Spark. The momentary event of electricity jumping between two conductors — the arc, the flash, the instant of crossing the gap. Not sustained like <span class="fi">hehku</span>. Selection highlight. Peak value indicator. The instant before you release the key.
+      </div>
+    </div>
+  </div>
+
+  <hr class="amber">
+
+  <!-- ════ DISPLAY — round pip (foliage) ════ -->
+
+  <div class="entry" id="lehto">
+    <a class="entry-pip shape-round" href="#top" style="background:#90c830" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--lehto</span>
+        <span class="entry-hex">#90c830</span>
+        <span class="entry-tag">display · primary text</span>
+      </div>
+      <div class="entry-body">
+        Deciduous grove, glade. Specifically a mixed grove that lets light through — varied species, undergrowth, the smell of something living and damp. Not <span class="fi">kuusi</span> (spruce forest, dark, dense, conifer-silent). <span class="fi">Lehto</span> is the friendly forest. Primary display text in fosfori mode. What the screen says when it has something to say.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="lehto-kirkas">
+    <a class="entry-pip shape-round" href="#top" style="background:#a0d840" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--lehto-kirkas</span>
+        <span class="entry-hex">#a0d840</span>
+        <span class="entry-tag">display · phosphor peak</span>
+      </div>
+      <div class="entry-body">
+        Bright grove. <span class="fi">Kirkas</span> = bright, clear, vivid, unobscured. P39 phosphor — zinc orthosilicate — peaks at 525nm. This is that colour. The canonical phosphor emission. What the VT100 looked like in 1978 in a dark room when the tube was new. The heading text on the kaiku display.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="sammal">
+    <a class="entry-pip shape-round" href="#top" style="background:#607840" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--sammal</span>
+        <span class="entry-hex">#607840</span>
+        <span class="entry-tag">display · muted text</span>
+      </div>
+      <div class="entry-body">
+        Moss. Bryophyte — the small, soft plant that grows on the north side of rocks, on fallen logs, on the forest floor in places that stay damp. Never loud. Always present underfoot in the Finnish forest after the snow melts. Muted display text. What the screen says when it is reporting something routine.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="sammal-kirkas">
+    <a class="entry-pip shape-round" href="#top" style="background:#708848" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--sammal-kirkas</span>
+        <span class="entry-hex">#708848</span>
+        <span class="entry-tag">display · subdued text</span>
+      </div>
+      <div class="entry-body">
+        Bright moss. After rain. The same moss as <span class="fi">sammal</span> but the water has brought it up — the colour intensifies when it is wet. Subdued display text that can still be read without effort. Secondary readout values, the parameters not currently being edited.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="haapa-kirkas">
+    <a class="entry-pip shape-round" href="#top" style="background:#d8ecc0" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--haapa-kirkas</span>
+        <span class="entry-hex">#d8ecc0</span>
+        <span class="entry-tag">display · heading / highlight</span>
+      </div>
+      <div class="entry-body">
+        Bright aspen. <span class="fi">Haapa</span> = the European aspen, <em>Populus tremula</em>. The Latin says it trembles; Finnish speakers knew this before they had Latin. The leaves move in any breath of air — always in motion, always catching light — and the Finnish word carries that motion inside it. The pale shimmer above the main display text: headings, the value currently being changed, the field that has focus.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="trabant-minttu">
+    <a class="entry-pip shape-round" href="#top" style="background:#78b890" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--trabant-minttu</span>
+        <span class="entry-hex">#78b890</span>
+        <span class="entry-tag">display · link</span>
+      </div>
+      <div class="entry-body">
+        Trabant Mintgrün. The factory paint specification for the Sachsenring Trabant 601 in mint green — a pigment mixed at Zwickau to a specific production standard and applied to Duroplast body panels for a specific production window. This is not "mint" in the abstract. It is the specific tone of a specific car from a specific country that no longer exists. Link colour in fosfori mode.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="minttu">
+    <a class="entry-pip shape-round" href="#top" style="background:#90c8a8" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--minttu</span>
+        <span class="entry-hex">#90c8a8</span>
+        <span class="entry-tag">display · link hover</span>
+      </div>
+      <div class="entry-body">
+        Mint. <span class="fi">Minttu</span> is a Finnish loanword from Swedish <em>mynta</em>, from Latin <em>mentha</em>, from Greek <em>míntha</em> — possibly pre-Greek, the plant predating the word by a long distance. The herb: clean, slightly cooling, persistent in the mouth. Hover state for <span class="fi">trabant-minttu</span> links. One step brighter, as things get when you approach them.
+      </div>
+    </div>
+  </div>
+
+  <hr class="amber">
+
+  <!-- ════ LABELS — flat bar pip ════ -->
+
+  <div class="entry" id="norsunluu">
+    <a class="entry-pip shape-bar" href="#top" style="background:#dfd0b0" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--norsunluu</span>
+        <span class="entry-hex">#dfd0b0</span>
+        <span class="entry-tag">labels · primary text</span>
+      </div>
+      <div class="entry-body">
+        Ivory. <span class="fi">Norsu</span> = elephant; <span class="fi">luu</span> = bone. Finnish names materials by what they come from — not a polite euphemism, just the compound noun for the material. Primary body text throughout the system. Parameter labels. The text that is simply there to be read, making no claim beyond legibility.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="hiekka">
+    <a class="entry-pip shape-bar" href="#top" style="background:#8a7a60" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--hiekka</span>
+        <span class="entry-hex">#8a7a60</span>
+        <span class="entry-tag">labels · subdued text</span>
+      </div>
+      <div class="entry-body">
+        Sand. Specifically beach sand — <span class="fi">hiekkaranta</span> is a sandy beach, <span class="fi">hiekkamaa</span> is sandy soil. Worn down from granite and quartz by glaciers and water over ten thousand years, becoming the floor of Baltic shores. Captions, subdued labels, the parameter name that is there when you look for it but does not press itself on you when you are not.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="tuhka">
+    <a class="entry-pip shape-bar" href="#top" style="background:#4a4030" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--tuhka</span>
+        <span class="entry-hex">#4a4030</span>
+        <span class="entry-tag">labels · disabled text</span>
+      </div>
+      <div class="entry-body">
+        Ash. The residue after fire — what is left when the fuel is spent and the heat has moved on. <span class="fi">Palaa tuhkaksi</span>: burns to ash. Complete transformation into something that no longer burns. Disabled text. The label that is present but cannot be reached.
+      </div>
+    </div>
+  </div>
+
+  <hr class="amber">
+
+  <!-- ════ COOL — square pip (berlin / bauhaus) ════ -->
+
+  <div class="entry" id="järvi">
+    <a class="entry-pip shape-square" href="#top" style="background:#3a7890" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--järvi</span>
+        <span class="entry-hex">#3a7890</span>
+        <span class="entry-tag">cool · link / info</span>
+      </div>
+      <div class="entry-body">
+        Lake. One of approximately 188,000 in Finland. The word is simple, definite, and unmetaphorical — Finns do not romanticize what they grew up surrounded by. Every Finnish child learned to swim in a <span class="fi">järvi</span>. Primary link colour throughout the KAAMOS system: the one cool note in a warm universe, unmistakable against the amber and void, its temperature doing the work of underlining.
+      </div>
+    </div>
+  </div>
+
+  <div class="entry" id="taivas">
+    <a class="entry-pip shape-square" href="#top" style="background:#80b8cc" title="back to palette"></a>
+    <div class="entry-content">
+      <div class="entry-head">
+        <span class="entry-term">--taivas</span>
+        <span class="entry-hex">#80b8cc</span>
+        <span class="entry-tag">cool · sky / pale accent</span>
+      </div>
+      <div class="entry-body">
+        Sky — and also heaven; Finnish uses one word for both. The sky you look up at and the destination share a noun. <span class="fi">Taivas</span> is the exact colour of Trabant Hellblau — the factory specification for the pale sky-blue finish applied to the Trabant 601. The palest tone in the cool register. The distance light travels through clear air on a day that knows it is temporary.
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="site-footer">
+    <a href="https://github.com/jmcgill-public/kaiku/tree/main/contrib" style="color:inherit; border-bottom:1px solid var(--meripihka-low); text-decoration:none;">kaiku</a> / <a href="/" style="color:inherit; border-bottom:1px solid var(--meripihka-low); text-decoration:none;">rebraining.org</a> &mdash; 27 tones &mdash; not flat, not digital primary, chosen
+  </footer>
+
+</div>
+</body>
+</html>

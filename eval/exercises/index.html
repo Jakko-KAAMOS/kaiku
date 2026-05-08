@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaiku / Ear Testing — rebraining.org</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ── musicians-memory.com palette ───────────────────────────────────
+       conservatory quad, just after rain. mountain town.
+       dark wet moss to chocolate, bordered by asphalt.
+       bone and spring on top. eagle's eye contrast where it counts.
+    ──────────────────────────────────────────────────────────────────── */
+    :root {
+      /* ground — backgrounds */
+      --quad-dark:     #131a0d;   /* dark wet moss — body */
+      --quad-surface:  #1b2515;   /* card surface — moss, slightly lifted */
+      --quad-warm:     #1e1810;   /* chocolate — warm alternate surface */
+      --asphalt:       #1e1e24;   /* perimeter — the cops' ground */
+
+      /* fosfori.css compat aliases */
+      --metsä-yö:      #131a0d;
+      --lehto-tumma:   #1b2515;
+      --lehto-vaalea:  #2c3e22;
+
+      /* borders */
+      --card-border:   #2e4224;   /* moss edge — solid, visible */
+      --card-border-sharp: #3e5830; /* hover / active edge */
+      --asphalt-edge:  #2e2e38;   /* cop perimeter */
+
+      /* foreground — high contrast */
+      --bone:          #e2d8b4;   /* primary text — bone dry */
+      --bone-bright:   #f0e8c8;   /* eagle's eye — sharp bone */
+      --spring:        #7ec840;   /* fresh spring green — accent */
+      --spring-dim:    #4a7828;   /* muted spring */
+      --bluegrass:     #6888b0;   /* KY bluegrass wet — cool accent */
+
+      /* carried: KaamOS signal colors */
+      --amber:         #c8a050;
+      --amber-dim:     #7a5c28;
+      --station-green: #5ad484;   /* brighter — eagle's eye */
+      --violet:        #8030c0;   /* Hiljaisuus — unchanged */
+
+      /* text scale */
+      --text-primary:  #e2d8b4;   /* bone */
+      --text-dim:      #7a9a60;   /* readable spring-dim */
+      --text-label:    #b0cc88;   /* label spring */
+
+      /* surfaces */
+      --card-bg:       #1b2515;
+      --card-hover:    #243020;
+      --tag-bg:        #2a3c1e;
+      --thumb-bg:      #f4edd8;
+      --thumb-ink:     #2a2018;
+
+      --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--quad-dark);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    /* ── site header ───────────────────────────────────────────────────── */
+    .site-header {
+      border-bottom: 1px solid var(--lehto-tumma);
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.2rem;
+      position: sticky;
+      top: 0;
+      background: rgba(19, 26, 13, 0.94);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+    }
+
+    .site-name {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      text-transform: lowercase;
+    }
+
+    .site-name a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-name a:hover { color: var(--amber); }
+
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .breadcrumb .sep { margin: 0 0.3em; opacity: 0.4; }
+    .breadcrumb .current { color: var(--spring); }
+
+    .pulse {
+      margin-left: auto;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--violet);
+      animation: hiljaisuus-pulse 6.67s ease-in-out infinite;
+    }
+
+    @keyframes hiljaisuus-pulse {
+      0%, 100% { opacity: 0.2; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── page header ───────────────────────────────────────────────────── */
+    .page-header {
+      padding: 3rem 2rem 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-weight: 300;
+      font-size: 2rem;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--spring);
+    }
+
+    .page-subtitle {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .page-meta {
+      margin-top: 1.4rem;
+      padding: 1rem 1.2rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--amber-dim);
+      font-size: 0.82rem;
+      color: var(--text-label);
+      line-height: 1.6;
+    }
+
+    .page-meta strong { color: var(--text-primary); font-weight: 500; }
+
+    /* ── phase nav ─────────────────────────────────────────────────────── */
+    .phase-nav {
+      max-width: 1100px;
+      margin: 2rem auto 0;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .phase-tab {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: all 0.15s;
+    }
+
+    .phase-tab:hover,
+    .phase-tab.active {
+      border-color: var(--amber-dim);
+      color: var(--amber);
+      background: rgba(200, 160, 80, 0.06);
+    }
+
+    /* ── section ───────────────────────────────────────────────────────── */
+    .phase-section {
+      max-width: 1100px;
+      margin: 2.5rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .phase-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--violet);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .phase-title {
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .phase-desc {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 1.4rem;
+      max-width: 680px;
+    }
+
+    /* ── exercise grid ─────────────────────────────────────────────────── */
+    .exercise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--card-border);
+      background: var(--card-border);
+    }
+
+    .exercise-card {
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      transition: background 0.15s;
+    }
+
+    .exercise-card:hover {
+      background: var(--card-hover);
+    }
+
+    /* thumbnail */
+    .thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: var(--thumb-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--thumb-ink);
+      outline: 1px solid var(--thumb-ink);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .thumb svg { width: 92%; opacity: 1; }
+
+    /* near-black notation on parchment — overrides inline SVG attributes */
+    .thumb svg line    { stroke: var(--thumb-ink) !important; }
+    .thumb svg ellipse { fill:   var(--thumb-ink) !important; opacity: 1 !important; }
+    .thumb svg text    { fill:   var(--thumb-ink) !important; opacity: 1 !important; }
+    .thumb svg path    { stroke: var(--thumb-ink) !important; fill: none !important; }
+
+    /* card body */
+    .card-body {
+      padding: 0.75rem 0.9rem 0.9rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .exercise-id {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--spring);
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .card-title {
+      font-size: 0.84rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1.35;
+      flex: 1;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      padding: 0.15rem 0.45rem;
+      background: var(--tag-bg);
+      color: var(--text-label);
+      letter-spacing: 0.04em;
+    }
+
+    .tag.register { color: var(--station-green); }
+    .tag.motion   { color: var(--bluegrass); }
+    .tag.envelope { color: var(--amber); }
+
+    /* links row */
+    .card-links {
+      margin-top: auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .card-links a {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--lehto-vaalea);
+      letter-spacing: 0.04em;
+      transition: all 0.12s;
+    }
+
+    .card-links a:hover {
+      color: var(--bone-bright);
+      border-color: var(--card-border-sharp);
+    }
+
+    .card-links a.pdf:hover  { color: var(--spring); border-color: var(--spring-dim); }
+    .card-links a.midi:hover { color: var(--bluegrass); border-color: var(--bluegrass); }
+
+    /* ── instructions strip ────────────────────────────────────────────── */
+    .instructions {
+      max-width: 1100px;
+      margin: 3rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .instructions h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.8rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.06em;
+    }
+
+    .instruction-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--card-border);
+      background: var(--card-border);
+      margin-bottom: 1px;
+    }
+
+    .instr-block {
+      background: var(--card-bg);
+      padding: 1rem 1.1rem;
+    }
+
+    .instr-block h3 {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--amber);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.55rem;
+    }
+
+    .instr-block p, .instr-block li {
+      font-size: 0.8rem;
+      color: var(--text-label);
+      line-height: 1.6;
+    }
+
+    .instr-block ul { padding-left: 1.1em; }
+    .instr-block li + li { margin-top: 0.2rem; }
+
+    .instr-block .do   { color: var(--station-green); }
+    .instr-block .dont { color: #c05040; }
+
+    /* ── footer ────────────────────────────────────────────────────────── */
+    footer {
+      max-width: 1100px;
+      margin: 3rem auto 2rem;
+      padding: 1rem 2rem 0;
+      border-top: 1px solid var(--lehto-tumma);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    footer a {
+      color: var(--amber);
+      text-decoration: none;
+    }
+
+    /* ── placeholder staff SVG ─────────────────────────────────────────── */
+  </style>
+</head>
+<body>
+
+<!-- ── site header ──────────────────────────────────────────────────── -->
+<header class="site-header">
+  <span class="site-name"><a href="/">rebraining.org</a></span>
+  <span class="breadcrumb">
+    <span class="sep">/</span> practice
+    <span class="sep">/</span> music
+    <span class="sep">/</span> <span class="current">kaiku</span>
+  </span>
+  <div class="pulse" title="Hiljaisuus — 0.15 Hz"></div>
+</header>
+
+<!-- ── page header ──────────────────────────────────────────────────── -->
+<div class="page-header">
+  <h1>Kaiku — <em>Ear Testing</em></h1>
+  <p class="page-subtitle">Phase 1 · Windows64 VST3i · F# Phrygian · 48 kHz / 24-bit</p>
+
+  <div class="page-meta" style="border-left-color: var(--spring-dim); font-style: italic; color: var(--text-primary);">
+    Load the MIDI. Load the VST. Play it.<br>
+    Listen past the note. The rest between notes — that's the test.<br>
+    <span style="font-style: normal; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); display: block; margin-top: 0.6rem;">— Selli &nbsp;·&nbsp; <a href="https://github.com/jmcgill-public/kaiku/wiki" style="color: var(--text-dim);">notes and findings → GitHub wiki</a></span>
+  </div>
+</div>
+
+<!-- ── phase nav ────────────────────────────────────────────────────── -->
+<nav class="phase-nav">
+  <a href="#phase-1" class="phase-tab active">I — Timbre</a>
+  <a href="#phase-2" class="phase-tab">II — Motion</a>
+  <a href="#phase-3" class="phase-tab">III — Ensemble</a>
+  <a href="#phase-4" class="phase-tab">IV — Envelope</a>
+  <a href="#instructions" class="phase-tab">Instructions</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- PHASE I — TIMBRE                                                   -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase-1">
+  <p class="phase-label">Phase I</p>
+  <h2 class="phase-title">Timbre — Single Voice</h2>
+  <p class="phase-desc">
+    One pitch class at a time. Whole notes, whole rests. The rest is the test — listen for the reverb tail,
+    the release, the 1.008× beat. Each register has a different beat period. Do not skip the contrabass.
+  </p>
+
+  <div class="exercise-grid">
+
+    <!-- E01 -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E01-thumb.png" alt="E01 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E01</span>
+          <span class="card-title">Soprano — F# Phrygian, sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">soprano</span>
+          <span class="tag">whole notes</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E01.pdf" class="pdf">PDF</a>
+          <a href="midi/E01-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- E02 -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E02-thumb.png" alt="E02 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E02</span>
+          <span class="card-title">High Tenor — F# Phrygian, sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">high tenor</span>
+          <span class="tag">whole notes</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E02.pdf" class="pdf">PDF</a>
+          <a href="midi/E02-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- E03 -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E03-thumb.png" alt="E03 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E03</span>
+          <span class="card-title">Low Tenor — F# Phrygian, sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">low tenor</span>
+          <span class="tag">whole notes</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E03.pdf" class="pdf">PDF</a>
+          <a href="midi/E03-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- E04 -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E04-thumb.png" alt="E04 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E04</span>
+          <span class="card-title">Contrabass — F# Phrygian, sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">contrabass</span>
+          <span class="tag">whole notes</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E04.pdf" class="pdf">PDF</a>
+          <a href="midi/E04-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- E05 -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E05-thumb.png" alt="E05 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E05</span>
+          <span class="card-title">The b2 — G♮, all registers</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">all</span>
+          <span class="tag motion">characteristic</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E05.pdf" class="pdf">PDF</a>
+          <a href="midi/E05-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- E06 — Piano reference -->
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E06-thumb.png" alt="E06 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E06</span>
+          <span class="card-title">Piano — full range, reference</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">piano</span>
+          <span class="tag">reference</span>
+          <span class="tag">solo</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E06.pdf" class="pdf">PDF</a>
+          <a href="midi/E06-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- PHASE II — MOTION                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase-2">
+  <p class="phase-label">Phase II</p>
+  <h2 class="phase-title">Motion — Two Voices</h2>
+  <p class="phase-desc">
+    All exercises: soprano + piano reference. Whole notes throughout. Two things are being tested simultaneously:
+    FM formant interaction between voices, and the ensemble render path.
+  </p>
+
+  <div class="exercise-grid">
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E07-thumb.png" alt="E07 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E07</span>
+          <span class="card-title">Similar motion</span>
+        </div>
+        <div class="tags">
+          <span class="tag motion">similar</span>
+          <span class="tag">two voice</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E07.pdf" class="pdf">PDF</a>
+          <a href="midi/E07-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E08-thumb.png" alt="E08 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E08</span>
+          <span class="card-title">Contrary motion</span>
+        </div>
+        <div class="tags">
+          <span class="tag motion">contrary</span>
+          <span class="tag">two voice</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E08.pdf" class="pdf">PDF</a>
+          <a href="midi/E08-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E09-thumb.png" alt="E09 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E09</span>
+          <span class="card-title">Parallel thirds</span>
+        </div>
+        <div class="tags">
+          <span class="tag motion">parallel</span>
+          <span class="tag">thirds</span>
+          <span class="tag">two voice</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E09.pdf" class="pdf">PDF</a>
+          <a href="midi/E09-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E10-thumb.png" alt="E10 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E10</span>
+          <span class="card-title">Parallel fourths</span>
+        </div>
+        <div class="tags">
+          <span class="tag motion">parallel</span>
+          <span class="tag">fourths</span>
+          <span class="tag">two voice</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E10.pdf" class="pdf">PDF</a>
+          <a href="midi/E10-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E11-thumb.png" alt="E11 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E11</span>
+          <span class="card-title">Parallel fifths</span>
+        </div>
+        <div class="tags">
+          <span class="tag motion">parallel</span>
+          <span class="tag">fifths</span>
+          <span class="tag">two voice</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E11.pdf" class="pdf">PDF</a>
+          <a href="midi/E11-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- PHASE III — ENSEMBLE                                               -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase-3">
+  <p class="phase-label">Phase III</p>
+  <h2 class="phase-title">Ensemble — Full Texture</h2>
+  <p class="phase-desc">
+    All parts. The question is blend, mask, and alias — not timbre. Does the nasal partial
+    disappear in full texture or dominate? Does the wheel carrier create beating artifacts between parts?
+  </p>
+
+  <div class="exercise-grid">
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E12-thumb.png" alt="E12 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E12</span>
+          <span class="card-title">Full texture — sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">all parts</span>
+          <span class="tag">whole notes</span>
+          <span class="tag">ensemble</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E12.pdf" class="pdf">PDF</a>
+          <a href="midi/E12-ensemble.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E13-thumb.png" alt="E13 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E13</span>
+          <span class="card-title">Full texture — mixed motion</span>
+        </div>
+        <div class="tags">
+          <span class="tag register">all parts</span>
+          <span class="tag motion">mixed</span>
+          <span class="tag">ensemble</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E13.pdf" class="pdf">PDF</a>
+          <a href="midi/E13-solo.mid" class="midi">MIDI solo</a>
+          <a href="midi/E13-ensemble.mid" class="midi">MIDI ens</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- PHASE IV — ENVELOPE                                                -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase-4">
+  <p class="phase-label">Phase IV</p>
+  <h2 class="phase-title">Envelope & Dynamics</h2>
+  <p class="phase-desc">
+    Attack, sustain, release, tail. The Hiljaisuus LFO completes one cycle at ♩=40.
+    Slow tempo exercises are deliberate — let the render breathe.
+  </p>
+
+  <div class="exercise-grid">
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E14-thumb.png" alt="E14 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E14</span>
+          <span class="card-title">Staccato — pp through ff</span>
+        </div>
+        <div class="tags">
+          <span class="tag envelope">envelope</span>
+          <span class="tag">velocity</span>
+          <span class="tag">release</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E14.pdf" class="pdf">PDF</a>
+          <a href="midi/E14-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E15-thumb.png" alt="E15 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E15</span>
+          <span class="card-title">Crescendo — sustained</span>
+        </div>
+        <div class="tags">
+          <span class="tag envelope">envelope</span>
+          <span class="tag">sustain</span>
+          <span class="tag">drift</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E15.pdf" class="pdf">PDF</a>
+          <a href="midi/E15-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E16-thumb.png" alt="E16 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E16</span>
+          <span class="card-title">LFO cycle — ♩=40, slow tempo</span>
+        </div>
+        <div class="tags">
+          <span class="tag envelope">LFO</span>
+          <span class="tag">Hiljaisuus</span>
+          <span class="tag">0.15 Hz</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E16.pdf" class="pdf">PDF</a>
+          <a href="midi/E16-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="thumb">
+        <img src="scores/E17-thumb.png" alt="E17 notation thumbnail">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="exercise-id">E17</span>
+          <span class="card-title">Re-trigger — same pitch, rapid</span>
+        </div>
+        <div class="tags">
+          <span class="tag envelope">re-trigger</span>
+          <span class="tag">voice steal</span>
+          <span class="tag">legato</span>
+        </div>
+        <div class="card-links">
+          <a href="scores/E17.pdf" class="pdf">PDF</a>
+          <a href="midi/E17-solo.mid" class="midi">MIDI</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- INSTRUCTIONS                                                        -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<section class="instructions" id="instructions">
+  <h2>// instructions</h2>
+  <div class="instruction-cols">
+
+    <div class="instr-block">
+      <h3>Setup</h3>
+      <p>Open <code>eval/reaper-template.rpp</code>. Kaiku is pre-loaded on the MIDI track.
+      Render settings: 48 kHz, 24-bit, stereo. Do not change them.
+      Use headphones or nearfield monitors. Enable REAPER's spectrum analyser on the master bus before you render.</p>
+    </div>
+
+    <div class="instr-block">
+      <h3>What you're listening for</h3>
+      <ul>
+        <li>The slow beat (wheel carrier, ~1.008×). It changes period with register. Wait for it.</li>
+        <li>The reverb tail in the rests. That's half the test.</li>
+        <li>The b2 — G♮ — in context. It should pull toward F#.</li>
+        <li>Any click, pop, or artifact on attack or release.</li>
+        <li>In the spectrogram: harmonic series, FM sideband pairs, noise floor cleanliness.</li>
+      </ul>
+    </div>
+
+    <div class="instr-block">
+      <h3>Inspecting renders</h3>
+      <p>After each render: load the WAV into REAPER's media explorer and view with the spectrum analyser.
+      Look for clean harmonic series, consistent FM sidebands, and a flat noise floor.
+      Aliasing shows as spikes above 15 kHz. The wheel carrier beating is visible as paired sidebands at ±1.008× the fundamental.</p>
+    </div>
+
+    <div class="instr-block">
+      <h3>The HTML report</h3>
+      <p>One entry per exercise. Fields: <em>expected</em>, <em>observed</em>, rating (Pass / Marginal / Fail), free notes.
+      Marginal = you heard something but can't characterize it. Fail = artifact, wrong pitch, silence, pop.
+      If you're not sure, it's Marginal. Write what you heard.</p>
+    </div>
+
+    <div class="instr-block">
+      <h3 class="do">Submit</h3>
+      <ul>
+        <li class="do">Completed HTML report</li>
+        <li class="do">WAV renders for any Marginal or Fail exercise</li>
+        <li class="do">Spectrogram screenshots for anomalies</li>
+      </ul>
+    </div>
+
+    <div class="instr-block">
+      <h3 class="dont">Do not submit</h3>
+      <ul>
+        <li class="dont">REAPER project files</li>
+        <li class="dont">Spectrogram screenshots for passing exercises</li>
+        <li class="dont">Aesthetic opinions — this is functional testing</li>
+        <li class="dont">Revised or corrected MIDI</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="instr-block" style="margin-top:1px; border:1px solid var(--card-border); background:var(--card-bg); padding:1rem 1.1rem;">
+    <h3>What this means for Phase 2</h3>
+    <p style="font-size:0.8rem; color:var(--text-label); line-height:1.65;">
+      <strong style="color:var(--text-primary);">Phase 1 passes →</strong> Ensemble calibration and LFO parameter testing.<br>
+      <strong style="color:var(--text-primary);">b2 exercises fail →</strong> Operator rebalancing before anything else.<br>
+      <strong style="color:var(--text-primary);">Envelope artifacts →</strong> ADSR parameter review and voice-reset audit before Phase III.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <span>kaiku — ear testing · <a href="https://github.com/jmcgill-public/kaiku">github.com/jmcgill-public/kaiku</a></span>
+  <span><a href="/">rebraining.org</a></span>
+</footer>
+
+</body>
+</html> 
