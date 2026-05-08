@@ -14,7 +14,7 @@
 \score {
   \new Staff {
     \clef treble
-    \key d \major
+    \key fis \phrygian
     \tempo 4 = 40
     \time 4/4
     fis'2.\staccato\pp  r4 r1

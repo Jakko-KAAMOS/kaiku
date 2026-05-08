@@ -1,4 +1,4 @@
-\version "2.24.0"
+﻿\version "2.26.0"
 
 %% formatted for print annotation and Fire HD10 pen input
 #(set-global-staff-size 24)

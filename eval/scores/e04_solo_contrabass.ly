@@ -9,7 +9,7 @@
 \score {
   \new Staff {
     \clef bass
-    \key d \major
+    \key fis \phrygian
     \tempo 4 = 40
     \time 4/4
     % F# Phrygian ascending, contrabass register (F#1–F#2)

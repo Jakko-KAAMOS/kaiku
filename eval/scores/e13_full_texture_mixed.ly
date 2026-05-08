@@ -12,7 +12,7 @@
 
 soprano = {
   \clef treble
-  \key d \major
+  \key fis \phrygian
   \tempo 4 = 40
   \time 4/4
   fis''1 r1
@@ -28,7 +28,7 @@ soprano = {
 
 highTenor = {
   \clef treble
-  \key d \major
+  \key fis \phrygian
   \time 4/4
   fis'1 r1 fis'1 r1 fis'1 r1 fis'1 r1
   fis'1 r1 fis'1 r1 fis'1 r1 fis'1 r1
@@ -37,7 +37,7 @@ highTenor = {
 
 lowTenor = {
   \clef tenor
-  \key d \major
+  \key fis \phrygian
   \time 4/4
   fis1 r1 fis1 r1 fis1 r1 fis1 r1
   fis1 r1 fis1 r1 fis1 r1 fis1 r1
@@ -46,7 +46,7 @@ lowTenor = {
 
 contrabass = {
   \clef bass
-  \key d \major
+  \key fis \phrygian
   \time 4/4
   fis,1 r1 fis,1 r1 fis,1 r1 fis,1 r1
   fis,1 r1 fis,1 r1 fis,1 r1 fis,1 r1

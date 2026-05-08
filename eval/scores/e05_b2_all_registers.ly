@@ -14,7 +14,7 @@
   \new StaffGroup <<
     \new Staff {
       \clef treble
-      \key d \major
+      \key fis \phrygian
       \tempo 4 = 40
       \time 4/4
       \set Staff.instrumentName = "Soprano"
@@ -22,21 +22,21 @@
     }
     \new Staff {
       \clef treble
-      \key d \major
+      \key fis \phrygian
       \time 4/4
       \set Staff.instrumentName = "High Ten."
       r1 g'1 r1 r1
     }
     \new Staff {
       \clef tenor
-      \key d \major
+      \key fis \phrygian
       \time 4/4
       \set Staff.instrumentName = "Low Ten."
       r1 r1 g1 r1
     }
     \new Staff {
       \clef bass
-      \key d \major
+      \key fis \phrygian
       \time 4/4
       \set Staff.instrumentName = "Cbass"
       r1 r1 r1 g,1

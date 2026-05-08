@@ -15,7 +15,7 @@
 \score {
   \new Staff {
     \clef treble
-    \key d \major
+    \key fis \phrygian
     \tempo 4 = 40
     \time 4/4
     fis'1         % first trigger: 6 seconds

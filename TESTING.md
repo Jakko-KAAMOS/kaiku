@@ -4,7 +4,7 @@ Ear testing for the Kaiku VST3i. Windows64 build. F# Phrygian.
 
 The instrument makes sound. These exercises confirm which sound, and whether it is the correct one.
 
-This is the first iteration of [musicians-memory.com](https://musicians-memory.com) — practice materials for an instrument that does not exist anywhere else. Before testing, read [contrib/MISSION.md](contrib/MISSION.md) for the context that makes these exercises mean something.
+Before testing, read [contrib/MISSION.md](contrib/MISSION.md) for the context that makes these exercises mean something.
 
 ---
 

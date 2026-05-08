@@ -9,7 +9,7 @@
 \score {
   \new Staff {
     \clef treble
-    \key d \major
+    \key fis \phrygian
     \tempo 4 = 40
     \time 4/4
     % F# Phrygian ascending, high tenor register (F#4–F#5)

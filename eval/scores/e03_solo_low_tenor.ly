@@ -9,7 +9,7 @@
 \score {
   \new Staff {
     \clef tenor
-    \key d \major
+    \key fis \phrygian
     \tempo 4 = 40
     \time 4/4
     % F# Phrygian ascending, low tenor register (F#3–F#4)

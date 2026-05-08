@@ -12,7 +12,7 @@
 
 upper = \relative c'' {
   \clef treble
-  \key d \major
+  \key fis \phrygian
   \tempo 4 = 40
   \time 4/4
   fis1 r1
@@ -28,7 +28,7 @@ upper = \relative c'' {
 
 lower = \relative c {
   \clef bass
-  \key d \major
+  \key fis \phrygian
   \time 4/4
   fis1 r1
   g1  r1
