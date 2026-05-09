@@ -16,9 +16,9 @@ The 8-cent detuning in Tyhjyydenkaiku is in this lineage. So is the decision not
 
 ---
 
-**Scott, Raymond.** The Electronium (1959–c.1987, unfinished).
+**Scott, Raymond.** The Electronium (1959–c.1977, unfinished).
 
-The machine as composer. Not a synthesizer you play — a device that generates music autonomously. Scott worked on it from 1959 until his stroke in 1987. He considered it unfinished at his death. It was never wrong because it was never released.
+The machine as composer. Not a synthesizer you play — a device that generates music autonomously. Scott worked on it from 1959 and had given up on it approximately a decade before his stroke in 1987. He considered it unfinished. Never released.
 
 The question the Electronium was asking — what does it mean for a machine to compose, rather than to execute — has not been answered. It is still open. It is one of the questions Kaiku is sitting next to, not answering.
 
