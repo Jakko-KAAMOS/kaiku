@@ -3,7 +3,7 @@
 
 Taav's Wild Ride ends in West Berlin. This is the kit in the squat.
 Zero budget. Wrong instruments used correctly. Playable by Chad Evans
-on his e-kit, or by James on the KeyLab 88 mk2 pads.
+on his e-kit, or by Jakko on the KeyLab 88 mk2 pads.
 
 Reference for kick character: Markus Hirvonen, Insomnium.
 The kit does not live in 1982 audio fidelity. It lives in 1982 context.
@@ -13,7 +13,7 @@ The kit does not live in 1982 audio fidelity. It lives in 1982 context.
 ## Performers
 
 **Primary:** Chad Evans — e-drum kit, full physical performance, MIDI into plugin.
-**Fallback:** James McGill — KeyLab 88 mk2 pads. See midi_keylab88_berlin.md.
+**Fallback:** Jakko McGill — KeyLab 88 mk2 pads. See midi_keylab88_berlin.md.
 
 ---
 
@@ -285,4 +285,4 @@ came from somewhere. The room remembers where.
 
 *tonal_design branch. Not for public.*
 *Cross-reference: doru_pipeline.md, percussion_brief.md, midi_keylab88_berlin.md*
-*Performers: Chad Evans (primary), James McGill / KeyLab 88 mk2 (fallback)*
+*Performers: Chad Evans (primary), Jakko McGill / KeyLab 88 mk2 (fallback)*
