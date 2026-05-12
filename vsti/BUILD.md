@@ -23,7 +23,8 @@ Everything else is a bonus.
 sudo apt install cmake git build-essential \
     libx11-dev libxrandr-dev libxinerama-dev \
     libxcursor-dev libfreetype-dev \
-    libasound2-dev libwebkit2gtk-4.0-dev
+    libasound2-dev libwebkit2gtk-4.0-dev   # Ubuntu 22.04 (Jammy)
+# on Ubuntu 24.04 (Noble) the package is libwebkit2gtk-4.1-dev instead — same recipe otherwise.
 ```
 
 ### Build
