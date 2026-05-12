@@ -2,8 +2,7 @@
 ## tonal_design branch — working document
 
 Taav's Wild Ride ends in West Berlin. This is the kit in the squat.
-Zero budget. Wrong instruments used correctly. Playable by Chad Evans
-on his e-kit, or by Jakko on the KeyLab 88 mk2 pads.
+Zero budget. Wrong instruments used correctly. Playable on an e-kit or, as fallback, on the KeyLab 88 mk2 pads.
 
 Reference for kick character: Markus Hirvonen, Insomnium.
 The kit does not live in 1982 audio fidelity. It lives in 1982 context.
@@ -12,8 +11,8 @@ The kit does not live in 1982 audio fidelity. It lives in 1982 context.
 
 ## Performers
 
-**Primary:** Chad Evans — e-drum kit, full physical performance, MIDI into plugin.
-**Fallback:** Jakko McGill — KeyLab 88 mk2 pads. See midi_keylab88_berlin.md.
+**Primary:** TBD — e-drum kit, full physical performance, MIDI into plugin.
+**Fallback:** Jakko — KeyLab 88 mk2 pads. See midi_keylab88_berlin.md.
 
 ---
 
@@ -66,7 +65,7 @@ with the station IR placed on it. No snare rattle — this is a punk
 kit, the snare might be broken. This is correct.
 
 Round-robin: all 38 files. This is the most-hit piece in the kit.
-38 files means Chad can play a full take without a repeated hit.
+38 files means the kit player can play a full take without a repeated hit.
 Velocity layers:
   pp (1-40):   DM-CAJ 38.wav  (135ms) — ghost
   mp (41-70):  DM-CAJ 20.wav  (200ms)
@@ -107,7 +106,7 @@ Primary:  DM-SAG 10.wav  (278ms)
 Alt:      DM-SAG 03.wav  (416ms)
 
 Same folder, longer sustain files. The half-open position is the one
-that drives grooves. Chad's hi-hat controller foot position maps here.
+that drives grooves. The hi-hat controller foot position maps here.
 ```
 
 ### 7. HI-HAT OPEN — MANJEERA (JHANJ)
@@ -285,4 +284,4 @@ came from somewhere. The room remembers where.
 
 *tonal_design branch. Not for public.*
 *Cross-reference: doru_pipeline.md, percussion_brief.md, midi_keylab88_berlin.md*
-*Performers: Chad Evans (primary), Jakko McGill / KeyLab 88 mk2 (fallback)*
+*Performers: primary TBD, Jakko / KeyLab 88 mk2 (fallback)*
