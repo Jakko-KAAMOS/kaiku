@@ -55,6 +55,7 @@ private:
 
     void buildPatchList();
     void handleMidi (const juce::MidiMessage& msg);
+    FMPatch patchFromAPVTS() const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KaikuProcessor)
 };

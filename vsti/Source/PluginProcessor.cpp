@@ -126,11 +126,33 @@ void KaikuProcessor::handleMidi (const juce::MidiMessage& msg)
         voiceManager.allNotesOff();
 }
 
+FMPatch KaikuProcessor::patchFromAPVTS() const
+{
+    FMPatch p;
+    for (int op = 0; op < 6; ++op)
+    {
+        auto& o = p.ops[op];
+        o.ratio        = apvts.getRawParameterValue (ParamID::ratio     (op))->load();
+        o.index        = apvts.getRawParameterValue (ParamID::index     (op))->load();
+        o.indexPeak    = apvts.getRawParameterValue (ParamID::indexPeak (op))->load();
+        o.indexDecayMs = apvts.getRawParameterValue (ParamID::indexDecay(op))->load();
+        o.level        = apvts.getRawParameterValue (ParamID::level     (op))->load();
+        o.feedback     = apvts.getRawParameterValue (ParamID::feedback  (op))->load();
+        o.attackMs     = apvts.getRawParameterValue (ParamID::attack    (op))->load();
+        o.decayMs      = apvts.getRawParameterValue (ParamID::decay     (op))->load();
+        o.sustainLevel = apvts.getRawParameterValue (ParamID::sustain   (op))->load();
+        o.releaseMs    = apvts.getRawParameterValue (ParamID::release   (op))->load();
+    }
+    return p;
+}
+
 void KaikuProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                     juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
     buffer.clear();
+
+    voiceManager.applyPatch (patchFromAPVTS());
 
     // Process MIDI events in order
     int samplePos = 0;
