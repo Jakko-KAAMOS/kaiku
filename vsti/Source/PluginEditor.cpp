@@ -146,6 +146,11 @@ KaikuEditor::KaikuEditor (KaikuProcessor& p)
     statusLabel.setJustificationType (juce::Justification::centredRight);
     addAndMakeVisible (statusLabel);
 
+    // Randomize button
+    randomizeBtn.setLookAndFeel (&laf);
+    randomizeBtn.onClick = [this]() { randomizePatch(); };
+    addAndMakeVisible (randomizeBtn);
+
     startTime = juce::Time::getMillisecondCounterHiRes() * 0.001;
     startTimerHz (30);
     setSize (920, 620);   // must be last — triggers resized() immediately
@@ -203,11 +208,18 @@ void KaikuEditor::paint (juce::Graphics& g)
     g.drawText ("STACK 2 — WHEEL",      10 + opW * 2, 52, opW, 14,
                 juce::Justification::centred);
 
+    // Version — upper right
+    g.setColour (KaamOSLookAndFeel::dimAmber());
+    g.setFont (f.withHeight (10.0f));
+    g.drawText (juce::String ("v0.2"),
+                getWidth() - 60, 4, 56, 16,
+                juce::Justification::centredRight);
+
     // Footer lore line
     g.setColour (KaamOSLookAndFeel::inactive().brighter (0.3f));
     g.setFont (f.withHeight (9.5f));
     g.drawText (juce::String::fromUTF8(
-        "Tyhjyydenkaiku  —  echo of the void  —  kaamos  —  v0.1"),
+        "Tyhjyydenkaiku — echo of the void — kaamos"),
         0, getHeight() - 16, getWidth(), 14,
         juce::Justification::centred);
 }
@@ -252,10 +264,63 @@ void KaikuEditor::resized()
     trompetteLevel  .setBounds (tromp.removeFromLeft (200));
     tromp.removeFromLeft (20);
     trompetteThresh .setBounds (tromp.removeFromLeft (200));
+    tromp.removeFromLeft (20);
+    randomizeBtn    .setBounds (tromp.removeFromLeft (120).reduced (0, 10));
 
     // Status
     statusLabel.setBounds (getLocalBounds().removeFromBottom (18)
                                             .removeFromRight (200));
+}
+
+void KaikuEditor::randomizePatch()
+{
+    // Constrained FM randomizer.
+    // Locked:   ratio (all ops), trompette params, master level.
+    // Free:     index, indexPeak — the main timbral variables.
+    // Narrow:   level (carriers), feedback (op1 only), ADSR within musical ranges.
+
+    juce::Random rng;
+
+    // Musical ADSR ranges
+    auto randMs = [&](float lo, float hi) -> float {
+        return lo + rng.nextFloat() * (hi - lo);
+    };
+    auto randF = [&](float lo, float hi) -> float {
+        return lo + rng.nextFloat() * (hi - lo);
+    };
+
+    auto& apvts = processor.apvts;
+
+    for (int op = 0; op < 6; ++op)
+    {
+        bool isCarrier = (op % 2 == 0);
+
+        // Index: main timbral knob — wide range, both op types
+        if (auto* p = apvts.getParameter ("index_"    + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randF (0.2f, 4.0f)));
+        if (auto* p = apvts.getParameter ("idxPeak_"  + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randF (0.5f, 6.0f)));
+
+        // Level — carriers only, stay audible
+        if (isCarrier)
+            if (auto* p = apvts.getParameter ("level_"    + juce::String (op)))
+                p->setValueNotifyingHost (p->convertTo0to1 (randF (0.5f, 1.0f)));
+
+        // Feedback — op1 (F1 MOD) only, keep it subtle
+        if (op == 1)
+            if (auto* p = apvts.getParameter ("feedback_1"))
+                p->setValueNotifyingHost (p->convertTo0to1 (randF (0.0f, 0.25f)));
+
+        // ADSR — musical ranges
+        if (auto* p = apvts.getParameter ("attack_"   + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randMs (1.0f,  30.0f)));
+        if (auto* p = apvts.getParameter ("decay_"    + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randMs (20.0f, 400.0f)));
+        if (auto* p = apvts.getParameter ("sustain_"  + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randF  (0.4f,  0.9f)));
+        if (auto* p = apvts.getParameter ("release_"  + juce::String (op)))
+            p->setValueNotifyingHost (p->convertTo0to1 (randMs (30.0f, 600.0f)));
+    }
 }
 
 juce::AudioProcessorEditor* KaikuProcessor::createEditor()

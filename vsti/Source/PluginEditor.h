@@ -56,6 +56,9 @@ private:
     juce::Label  statusLabel;
     double       startTime = 0.0;
 
+    // ── Randomizer ────────────────────────────────────────────────────────────
+    juce::TextButton randomizeBtn { "RANDOMIZE" };
+
     // ── APVTS attachments ─────────────────────────────────────────────────────
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterAtt;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> trompLvlAtt;
@@ -65,6 +68,7 @@ private:
     void timerCallback() override;
     void buildPatchSelector();
     void layoutOpPanels (juce::Rectangle<int> area);
+    void randomizePatch();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KaikuEditor)
 };
