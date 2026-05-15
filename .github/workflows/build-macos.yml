@@ -1,0 +1,47 @@
+name: macOS build
+
+on:
+  push:
+    tags:
+      - 'v*-macos'
+      - 'v*-all'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install cmake ninja
+
+      - name: Configure
+        run: |
+          cd vsti
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -G Ninja
+
+      - name: Build
+        run: |
+          cd vsti
+          cmake --build build --parallel
+
+      - name: Collect artefacts
+        run: |
+          mkdir -p dist
+          cp -r vsti/build/Kaiku_artefacts/Release/VST3/Kaiku.vst3 dist/
+          cp -r vsti/build/Kaiku_artefacts/Release/AU/Kaiku.component dist/
+          cd dist
+          zip -r ../Kaiku-${{ github.ref_name }}-macos-universal.zip Kaiku.vst3 Kaiku.component
+          cd ..
+          md5 Kaiku-${{ github.ref_name }}-macos-universal.zip
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Kaiku-${{ github.ref_name }}-macos-universal.zip
+          tag_name: ${{ github.ref_name }}
