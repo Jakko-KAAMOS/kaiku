@@ -164,6 +164,8 @@ FMPatch KaikuProcessor::patchFromAPVTS() const
         o.sustainLevel = apvts.getRawParameterValue (ParamID::sustain   (op))->load();
         o.releaseMs    = apvts.getRawParameterValue (ParamID::release   (op))->load();
     }
+    p.trompetteLevel  = apvts.getRawParameterValue (ParamID::TROMPETTE_LEVEL) ->load();
+    p.trompetteThresh = apvts.getRawParameterValue (ParamID::TROMPETTE_THRESH)->load();
     return p;
 }
 

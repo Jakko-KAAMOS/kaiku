@@ -17,8 +17,6 @@
 class KaikuVoice
 {
 public:
-    static constexpr float TROMPETTE_VELOCITY_THRESHOLD = 0.70f;  // 0-1
-
     void prepare (double sampleRate);
     void applyPatch (const FMPatch& patch);
 
@@ -35,8 +33,9 @@ public:
     void processSample (float& left, float& right);
 
     // Trompette parameters (tweakable via preset)
-    float trompetteLevel = 0.15f;  // -16dB relative to primary
-    float trompetteDecayMs = 80.0f;
+    float trompetteLevel    = 0.15f;  // -16dB relative to primary
+    float trompetteThresh   = 0.70f;  // velocity threshold [0,1]
+    float trompetteDecayMs  = 80.0f;
 
 private:
     double sampleRate  = 44100.0;

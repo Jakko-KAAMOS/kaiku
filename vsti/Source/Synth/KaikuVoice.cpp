@@ -17,6 +17,8 @@ void KaikuVoice::prepare (double sr)
 void KaikuVoice::applyPatch (const FMPatch& patch)
 {
     primary.applyPatch (patch);
+    trompetteLevel  = patch.trompetteLevel;
+    trompetteThresh = patch.trompetteThresh;
     // Trompette patch is fixed — it's not a user preset, it's instrument physics
     configureTrompette();
 }
@@ -52,7 +54,7 @@ void KaikuVoice::noteOn (int midiNote, float velocity)
     primary.noteOn (hz, velocity);
 
     // Trompette fires on accented notes only
-    trompetteActive = (velocity >= TROMPETTE_VELOCITY_THRESHOLD);
+    trompetteActive = (velocity >= trompetteThresh);
     if (trompetteActive)
         trompette.noteOn (hz, velocity);
 }

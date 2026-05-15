@@ -41,8 +41,10 @@ struct FMPatch
     };
 
     OpParams ops[6];
-    float    masterLevel  = 0.8f;
-    float    detuneAmount = 8.0f;   // Hz of detune on ops[2] (second hurdy string)
+    float    masterLevel      = 0.8f;
+    float    detuneAmount     = 8.0f;   // Hz of detune on ops[2] (second hurdy string)
+    float    trompetteLevel  = 0.15f; // Level of trompette layer relative to primary
+    float    trompetteThresh = 0.70f; // Velocity threshold [0,1] for trompette trigger
     std::string name;
 
     static FMPatch makeTyhjyydenkaiku();
