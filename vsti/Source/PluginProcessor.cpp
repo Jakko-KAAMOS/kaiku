@@ -66,7 +66,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout KaikuProcessor::createParame
     }
 
     layout.add (std::make_unique<juce::AudioParameterFloat>
-        (ParamID::MASTER_LEVEL,    "Master Level",      pct,    0.8f));
+        (ParamID::MASTER_LEVEL,    "Master Level",      pct,    0.25f));
     layout.add (std::make_unique<juce::AudioParameterFloat>
         (ParamID::TROMPETTE_LEVEL, "Trompette Level",   pct,    0.15f));
     layout.add (std::make_unique<juce::AudioParameterFloat>
@@ -105,7 +105,28 @@ void KaikuProcessor::setCurrentProgram (int index)
     if (index >= 0 && index < (int)patches.size())
     {
         currentPatch = index;
-        voiceManager.applyPatch (patches[(size_t)index]);
+        const FMPatch& p = patches[(size_t)index];
+
+        // Push preset values into the APVTS so patchFromAPVTS() picks them up
+        // next block and the knobs reflect the loaded preset.
+        for (int op = 0; op < 6; ++op)
+        {
+            const auto& o = p.ops[op];
+            auto set = [&](const juce::String& id, float v) {
+                if (auto* param = apvts.getParameter (id))
+                    param->setValueNotifyingHost (param->convertTo0to1 (v));
+            };
+            set (ParamID::ratio     (op), o.ratio);
+            set (ParamID::index     (op), o.index);
+            set (ParamID::indexPeak (op), o.indexPeak);
+            set (ParamID::indexDecay(op), o.indexDecayMs);
+            set (ParamID::level     (op), o.level);
+            set (ParamID::feedback  (op), o.feedback);
+            set (ParamID::attack    (op), o.attackMs);
+            set (ParamID::decay     (op), o.decayMs);
+            set (ParamID::sustain   (op), o.sustainLevel);
+            set (ParamID::release   (op), o.releaseMs);
+        }
     }
 }
 
